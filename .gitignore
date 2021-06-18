@@ -1,3 +1,4 @@
 inp
 .vscode/
 *.o
+compiler parser.cc parser.hh location.hh scanner.cc
