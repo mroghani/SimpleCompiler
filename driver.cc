@@ -27,6 +27,9 @@ Var driver::make_variable(std::string id, yy::location & loc, int type, int size
     throw yy::parser::syntax_error(loc, "multiple definitions for '" + id + "'");
   }
 
+  // TODO: arrays.
+  // TODO: Offsets should be with recpect to functions not scopes.
+
   std::cerr << id << curr_scope << std::endl;
 
   Var var;

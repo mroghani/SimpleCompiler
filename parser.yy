@@ -100,23 +100,23 @@ class driver;
 %%
 %start unit;
 
-unit: programm YYEOF                      { std::cout << "goodbye" << std::endl; }
+unit: programm YYEOF                      { std::cout << "goodbye" << std::endl;  /* TODO: Output code. */}
 
 
 programm: declLists                       { $$ = $1; }
         ;
 
 declLists: %empty                         { $$ = Node(); }
-         | declLists decl                 { $$ = $2; }
+         | declLists decl                 { $$ = $2;  /* TODO: code gen. */}
          ;
 
 decl: varDecl "."                         { $$ = $1; }
-    | funcDecl                            { $$ = $1; }
+    | funcDecl                            { $$ = $1;  /* TODO */}
     ;
 
 varDecl: varType ID                       { drv.make_variable($2, @2, $1, 0, 0); $$ = Node(); }
        | varType ID "=" constant          { drv.make_variable($2, @2, $1, 0, $4.value); $$ = Node(); }
-       | varType ID "[" INTCONST "]"      { drv.make_variable($2, @2, $1, $4, 0); $$ = Node(); }    
+       | varType ID "[" INTCONST "]"      { drv.make_variable($2, @2, $1, $4, 0); $$ = Node(); /* TODO: arrays are ignored right now! */}    
        ;
 
 varType: INT   { $$ = 1; }
@@ -180,24 +180,24 @@ returnStmt: RETURN "."
 expStmt: exp "."                   
        ;
 
-exp: simpleExp                     { $$ = $1; }
-   | mutable "=" exp               { $$ = $3; }
+exp: simpleExp                     { $$ = $1; /* TODO */}
+   | mutable "=" exp               { $$ = $3; /* TODO */}
    ;
 
-simpleExp: simpleExp "|" andExp    { $$ = $1; }
-         | andExp                  { $$ = $1; }
+simpleExp: simpleExp "|" andExp    { $$ = $1; /* TODO */}
+         | andExp                  { $$ = $1; /* TODO */}
          ;
 
-andExp: andExp "&" unaryRelExp     { $$ = $1; }
-      | unaryRelExp                { $$ = $1; }
+andExp: andExp "&" unaryRelExp     { $$ = $1; /* TODO */}
+      | unaryRelExp                { $$ = $1; /* TODO */}
       ;
 
-unaryRelExp: "!" unaryRelExp       { $$ = $2; }
-           | relExp                { $$ = $1; }
+unaryRelExp: "!" unaryRelExp       { $$ = $2; /* TODO */}
+           | relExp                { $$ = $1; /* TODO */}
            ;
 
-relExp: sumExp relop sumExp        { $$ = $1; }
-      | sumExp                     { $$ = $1; }
+relExp: sumExp relop sumExp        { $$ = $1; /* TODO */}
+      | sumExp                     { $$ = $1; /* TODO */}
       ;
       
 relop: "=="
@@ -208,32 +208,32 @@ relop: "=="
      | ">"
      ;
 
-sumExp: sumExp sumop mulExp        { $$ = $1; }
-      | mulExp                     { $$ = $1; }
+sumExp: sumExp sumop mulExp        { $$ = $1; /* TODO */}
+      | mulExp                     { $$ = $1; /* TODO */}
       ;
 
 sumop: "+"
      | "-"
      ;
 
-mulExp: mulExp mulop unaryExp      { $$ = $1; }
-      | unaryExp                   { $$ = $1; }
+mulExp: mulExp mulop unaryExp      { $$ = $1; /* TODO */}
+      | unaryExp                   { $$ = $1; /* TODO */}
       ;
 
 mulop: "*"
      | "/"
      ;
 
-unaryExp: unaryop unaryExp         { $$ = $2; }
-        | factor                   { $$ = $1; }
+unaryExp: unaryop unaryExp         { $$ = $2; /* TODO */}
+        | factor                   { $$ = $1; /* TODO */}
         ;
 
 unaryop: "+"
        | "-"
        ;
 
-factor: immutable           { $$ = $1; } 
-      | mutable             { $$ = $1; }
+factor: immutable           { $$ = $1; /* TODO */} 
+      | mutable             { $$ = $1; /* TODO */}
       ;
 
 mutable: ID                 { $$ = helpers::make_mutable(drv, $1, @1, nullptr); }
@@ -245,12 +245,13 @@ immutable: "(" exp ")"      { $$ = $2; }
                               if ($1.type == Node::Type::VOID) {
                                      error(@1, "void type can not be used as immutable.");
                               }
-                              $$ = $1;
+                              $$ = $1; // TODO
                             }
          | constant         { $$ = $1; }
          ;
 
-call: ID "(" args ")"       { $$ = helpers::make_mutable(drv, $1, @1, nullptr); }
+call: ID "(" args ")"       { $$ = helpers::make_mutable(drv, $1, @1, nullptr); // TODO: COMOLETE BULLSHIT
+                            }
     ;
 
 args: %empty
