@@ -90,10 +90,12 @@ class driver;
 %nterm <std::vector<Var>>           params paramList;
 %nterm <Var>            paramItem;
 
+%nterm <int>            unaryop sumop mulop relop;
+
 
 %nterm <Node>           constant immutable mutable exp call unaryExp factor;
 %nterm <Node>           simpleExp andExp unaryRelExp relExp sumExp mulExp;
-%nterm <Node>           programm declLists decl varDecl funcDecl;
+%nterm <Node>           programm declLists decl varDecl funcDecl expStmt;
 
 
 // grammar
@@ -177,63 +179,63 @@ returnStmt: RETURN "."
 
 
 
-expStmt: exp "."                   
+expStmt: exp "."                   { $$ = $1; }
        ;
 
-exp: simpleExp                     { $$ = $1; /* TODO */}
+exp: simpleExp                     { $$ = $1; }
    | mutable "=" exp               { $$ = $3; /* TODO */}
    ;
 
 simpleExp: simpleExp "|" andExp    { $$ = $1; /* TODO */}
-         | andExp                  { $$ = $1; /* TODO */}
+         | andExp                  { $$ = $1; }
          ;
 
 andExp: andExp "&" unaryRelExp     { $$ = $1; /* TODO */}
-      | unaryRelExp                { $$ = $1; /* TODO */}
+      | unaryRelExp                { $$ = $1; }
       ;
 
 unaryRelExp: "!" unaryRelExp       { $$ = $2; /* TODO */}
-           | relExp                { $$ = $1; /* TODO */}
+           | relExp                { $$ = $1; }
            ;
 
 relExp: sumExp relop sumExp        { $$ = $1; /* TODO */}
-      | sumExp                     { $$ = $1; /* TODO */}
+      | sumExp                     { $$ = $1; }
       ;
       
-relop: "=="
-     | "<="
-     | ">="
-     | "!="
-     | "<"
-     | ">"
+relop: "=="                        { $$ = 1; }
+     | "<="                        { $$ = 2; }
+     | ">="                        { $$ = 3; }
+     | "!="                        { $$ = 4; }
+     | "<"                         { $$ = 5; }
+     | ">"                         { $$ = 6; }
      ;
 
-sumExp: sumExp sumop mulExp        { $$ = $1; /* TODO */}
-      | mulExp                     { $$ = $1; /* TODO */}
+sumExp: sumExp sumop mulExp        { $$ = helpers::sum_exp($1, $2, $3); }
+      | mulExp                     { $$ = $1; }
       ;
 
-sumop: "+"
-     | "-"
+sumop: "+"                         { $$ = 1; }
+     | "-"                         { $$ = -1; }
      ;
 
-mulExp: mulExp mulop unaryExp      { $$ = $1; /* TODO */}
-      | unaryExp                   { $$ = $1; /* TODO */}
+mulExp: mulExp mulop unaryExp      { $$ = helpers::mul_exp($1, $2, $3);}
+      | unaryExp                   { $$ = $1; }
       ;
 
-mulop: "*"
-     | "/"
+mulop: "*"                         { $$ = 1; }
+     | "/"                         { $$ = 2; }
      ;
 
-unaryExp: unaryop unaryExp         { $$ = $2; /* TODO */}
-        | factor                   { $$ = $1; /* TODO */}
+unaryExp: unaryop unaryExp         { $$ = helpers::unary_exp($2, $1);}
+        | factor                   { $$ = $1; }
         ;
 
-unaryop: "+"
-       | "-"
+unaryop: "+"                { $$ = 1; }
+       | "-"                { $$ = -1; }
        ;
 
-factor: immutable           { $$ = $1; /* TODO */} 
-      | mutable             { $$ = $1; /* TODO */}
+factor: immutable           { $$ = $1;} 
+      | mutable             { $$ = helpers::extract_mutable($1); }
       ;
 
 mutable: ID                 { $$ = helpers::make_mutable(drv, $1, @1, nullptr); }

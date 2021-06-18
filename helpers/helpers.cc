@@ -49,7 +49,79 @@ Node helpers::make_mutable(driver & drv, std::string id, yy::location & loc, Nod
 
     node.code.text = text.str();
 
+    return node;
+}
 
+
+Node helpers::extract_mutable(Node & mu) {
+    // v0 = (v1)
+
+    Node node;
+
+    std::ostringstream text;
+    
+    text << mu.code.text;
+    text << "LW $v0, ($v1)" << std::endl;
+
+    node.code.text = text.str();
+
+    return node;
+}
+
+
+Node helpers::sum_exp(Node & left, int op, Node & right) {
+    Node node;
+
+    std::ostringstream text;
+    
+    text << right.code.text;
+    text << "MOVE $v1, $v0" << std::endl;
+    text << left.code.text;
+    if (op == 1) {
+        text << "ADD $v0, $v0, $v1" << std::endl;
+    } else {
+        text << "SUB $v0, $v0, $v1" << std::endl;
+    }
+
+    node.code.text = text.str();
+
+    return node;
+}
+
+
+Node helpers::mul_exp(Node & left, int op, Node & right) {
+    Node node;
+
+    std::ostringstream text;
+    
+    text << right.code.text;
+    text << "MOVE $v1, $v0" << std::endl;
+    text << left.code.text;
+    if (op == 1) {
+        text << "MUL $v0, $v0, $v1" << std::endl;
+    } else {
+        text << "DIV $v0, $v1" << std::endl;
+        text << "MFLO $v0" << std::endl;
+    }
+
+    node.code.text = text.str();
+
+    return node;
+}
+
+Node helpers::unary_exp(Node & uexp, int op) {
+    if (op == 1) {
+        return uexp;
+    }
+
+    Node node;
+
+    std::ostringstream text;
+    
+    text << uexp.code.text;
+    text << "NEGU $v0, $v0" << std::endl;
+
+    node.code.text = text.str();
 
     return node;
 }
