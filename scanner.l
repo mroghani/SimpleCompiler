@@ -50,9 +50,9 @@ blank [ \t\r]
 "return"      return yy::parser::make_RETURN            (loc);
 "main"        return yy::parser::make_MAIN              (loc);
 
-"int"        return yy::parser::make_INT                (loc);
-"char"       return yy::parser::make_CHAR               (loc);
-"void"       return yy::parser::make_VOID               (loc);
+"int"         return yy::parser::make_INT               (loc);
+"char"        return yy::parser::make_CHAR              (loc);
+"void"        return yy::parser::make_VOID              (loc);
 
 
 "="           return yy::parser::make_ASSIGN            (loc);

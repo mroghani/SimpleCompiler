@@ -82,8 +82,8 @@ class driver;
 ;
 
 
-%token <int>            INTCONST         "int constant";
-%token <int>            CHARCONST        "char constant";
+%token <int>            INTCONST         "const int";
+%token <int>            CHARCONST        "const char";
 %token <std::string>    ID               "identifier";
 
 %nterm <int>            varType;
@@ -232,13 +232,12 @@ unaryop: "+"
        | "-"
        ;
 
-
 factor: immutable           { $$ = $1; } 
       | mutable             { $$ = $1; }
       ;
 
-mutable: ID                 { $$ = helpers::make_mutable($1); }
-       | ID "[" exp "]"     { $$ = helpers::make_mutable($1); }
+mutable: ID                 { $$ = helpers::make_mutable(drv, $1, @1, nullptr); }
+       | ID "[" exp "]"     { $$ = helpers::make_mutable(drv, $1, @1, &$3); }
        ;
 
 immutable: "(" exp ")"      { $$ = $2; }
@@ -251,7 +250,7 @@ immutable: "(" exp ")"      { $$ = $2; }
          | constant         { $$ = $1; }
          ;
 
-call: ID "(" args ")"       { $$ = helpers::make_mutable($1); }
+call: ID "(" args ")"       { $$ = helpers::make_mutable(drv, $1, @1, nullptr); }
     ;
 
 args: %empty

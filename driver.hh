@@ -29,7 +29,7 @@ public:
     std::vector<std::map<std::string, Var>> variables;
 
     Var get_variable(std::string id, yy::location & loc);
-    Var make_variable(std::string id, yy::location &loc, int type, int size, int initial_value);
+    Var make_variable(std::string id, yy::location & loc, int type, int size, int initial_value);
     bool has_variable_in_scope(std::string id, int scope);
 
     void push_scope();
