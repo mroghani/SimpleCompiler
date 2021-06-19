@@ -1,0 +1,6 @@
+ADDI $v1, $sp, 0
+LW $v0, ($v1)
+MOVE $v2, $v0
+ADDI $v1, $sp, 4
+SW $v2, ($v1)
+MOVE $v0, $v2

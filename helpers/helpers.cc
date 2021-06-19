@@ -214,3 +214,10 @@ Node helpers::assign(Node & mu, Node & exp) {
 
     return node;
 }
+
+
+Node helpers::merge_nodes(Node & left, Node & right) {
+    Node node;
+    node.code.text = left.code.text + right.code.text;
+    return node;
+}

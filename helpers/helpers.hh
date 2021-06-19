@@ -16,6 +16,7 @@ namespace helpers
     Node unary_rel_exp(Node & uexp);
     Node binary_exp(Node & left, std::string op, Node & right);
     Node assign(Node & mu, Node & exp);
+    Node merge_nodes(Node & left, Node & right);
 };
 
 #endif

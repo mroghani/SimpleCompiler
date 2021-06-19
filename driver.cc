@@ -47,12 +47,19 @@ Var driver::make_variable(std::string id, yy::location & loc, int type, int size
   var.type = type == 1 ? Var::Type::INT : Var::Type::CHAR;
   var.initial_value = initial_value;
   variables.back()[id] = var;
+
+  // ! test
+  // std::cerr << variables.size() << std::endl;
+  // for (auto p : variables.back()) {
+  //   std::cerr << p.first << ": " << p.second.scope << " " << p.second.offset << std::endl;
+  // }
+
   return var;
 }
 
 Var driver::get_variable(std::string id, yy::location & loc) {
 
-  for (int scope = curr_scope - 1; scope >= 0; scope--) {
+  for (int scope = curr_scope; scope >= 0; scope--) {
     auto it = variables[scope].find(id);
     if (it != variables[scope].end()) {
       return it->second;

@@ -96,31 +96,31 @@ class driver;
 
 %nterm <Node>           constant immutable mutable exp call unaryExp factor;
 %nterm <Node>           simpleExp andExp unaryRelExp relExp sumExp mulExp;
-%nterm <Node>           programm declLists decl varDecl funcDecl expStmt;
+%nterm <Node>           programm declLists decl funcDecl expStmt;
 
 // TODO: add support for comments. ("//" == "$$" , "/* */" == "$* *$")
 // grammar
 %%
 %start unit;
 
-unit: programm YYEOF                      { std::cout << "goodbye" << std::endl;  /* TODO: Output code. */}
+unit: programm YYEOF                      { drv.make_output($1); std::cout << "goodbye" << std::endl;  /* TODO: Output code. */}
 
 
 programm: declLists                       { $$ = $1; }
         ;
 
 declLists: %empty                         { $$ = Node(); }
-         | declLists decl                 { $$ = $2;  /* TODO: code gen. */}
+         | declLists decl                 { $$ = helpers::merge_nodes($1, $2); }
          ;
 
-decl: varDecl "."                         { $$ = $1; }
-    | funcDecl                            { $$ = $1;  /* TODO */}
+decl: varDecl "."                         { $$ = Node(); }
+    | funcDecl                            { $$ = Node();  /* TODO */}
     ;
 
-varDecl: varType ID                       { drv.make_variable($2, @2, $1, 1, 0); $$ = Node(); }
-       | varType ID "=" constant          { drv.make_variable($2, @2, $1, 1, $4.value); $$ = Node(); }
-       | varType ID "=" "-" constant      { drv.make_variable($2, @2, $1, 1, -$5.value); $$ = Node(); }
-       | varType ID "[" INTCONST "]"      { drv.make_variable($2, @2, $1, $4, 0); $$ = Node(); /* TODO: arrays are ignored right now! */}    
+varDecl: varType ID                       { drv.make_variable($2, @2, $1, 1, 0); }
+       | varType ID "=" constant          { drv.make_variable($2, @2, $1, 1, $4.value); }
+       | varType ID "=" "-" constant      { drv.make_variable($2, @2, $1, 1, -$5.value); }
+       | varType ID "[" INTCONST "]"      { drv.make_variable($2, @2, $1, $4, 0); }    
        ;
 
 varType: INT   { $$ = 1; }
@@ -141,7 +141,7 @@ paramList: paramList "," paramItem        { $1.push_back($3); $$ = $1; }
          | paramItem                      { $$ = std::vector<Var>(1, $1); }   
          ;
 
-paramItem: varType ID                     { $$ = drv.make_variable($2, @2, $1, 0, 0); }
+paramItem: varType ID                     { $$ = drv.make_variable($2, @2, $1, 1, 0); }
          ;
 
 stmtList: varDecl "." stmtList
