@@ -117,9 +117,9 @@ decl: varDecl "."                         { $$ = $1; }
     | funcDecl                            { $$ = $1;  /* TODO */}
     ;
 
-varDecl: varType ID                       { drv.make_variable($2, @2, $1, 0, 0); $$ = Node(); }
-       | varType ID "=" constant          { drv.make_variable($2, @2, $1, 0, $4.value); $$ = Node(); }
-       | varType ID "=" "-" constant      { drv.make_variable($2, @2, $1, 0, -$5.value); $$ = Node(); }
+varDecl: varType ID                       { drv.make_variable($2, @2, $1, 1, 0); $$ = Node(); }
+       | varType ID "=" constant          { drv.make_variable($2, @2, $1, 1, $4.value); $$ = Node(); }
+       | varType ID "=" "-" constant      { drv.make_variable($2, @2, $1, 1, -$5.value); $$ = Node(); }
        | varType ID "[" INTCONST "]"      { drv.make_variable($2, @2, $1, $4, 0); $$ = Node(); /* TODO: arrays are ignored right now! */}    
        ;
 

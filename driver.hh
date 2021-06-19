@@ -34,6 +34,8 @@ public:
 
 
     // ====> VARIABLES
+    int global_offset;
+    int function_offset;
     std::vector<std::map<std::string, Var>> variables;
 
     Var get_variable(std::string id, yy::location & loc);
