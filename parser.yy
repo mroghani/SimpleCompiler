@@ -118,6 +118,7 @@ decl: varDecl "."                         { $$ = $1; }
 
 varDecl: varType ID                       { drv.make_variable($2, @2, $1, 0, 0); $$ = Node(); }
        | varType ID "=" constant          { drv.make_variable($2, @2, $1, 0, $4.value); $$ = Node(); }
+       | varType ID "=" "-" constant      { drv.make_variable($2, @2, $1, 0, -$5.value); $$ = Node(); }
        | varType ID "[" INTCONST "]"      { drv.make_variable($2, @2, $1, $4, 0); $$ = Node(); /* TODO: arrays are ignored right now! */}    
        ;
 
