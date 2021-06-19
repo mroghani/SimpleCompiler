@@ -144,6 +144,28 @@ Node helpers::rel_exp(Node & left, std::string op, Node & right) {
 }
 
 
+Node helpers::binary_exp(Node & left, std::string op, Node & right) {
+    Node node;
+
+    std::ostringstream text;
+    
+    text << right.code.text;
+    text << "MOVE $v1, $v0" << std::endl;
+    text << left.code.text;
+    
+    if(op == "&") {
+        text << "AND $v0, $v0, $v1" << std::endl;
+	} else {
+        // "|"   
+        text << "OR $v0, $v0, $v1" << std::endl;
+    }
+
+    node.code.text = text.str();
+
+    return node;
+}
+
+
 Node helpers::unary_exp(Node & uexp, int op) {
     if (op == 1) {
         return uexp;
@@ -155,6 +177,38 @@ Node helpers::unary_exp(Node & uexp, int op) {
     
     text << uexp.code.text;
     text << "NEGU $v0, $v0" << std::endl;
+
+    node.code.text = text.str();
+
+    return node;
+}
+
+
+Node helpers::unary_rel_exp(Node & uexp) {
+    Node node;
+
+    std::ostringstream text;
+    
+    text << uexp.code.text;
+    text << "NOT $v0, $v0" << std::endl;
+
+    node.code.text = text.str();
+
+    return node;
+}
+
+Node helpers::assign(Node & mu, Node & exp) {
+
+    Node node;
+
+    std::ostringstream text;
+    
+    text << exp.code.text; // v0 = exp
+    text << "MOVE $v2, $v0" << std::endl; // v2 = v0 = exp
+    text << mu.code.text; // $v1 = mutable address
+    text << "SW $v2, ($v1)" << std::endl; // mu = v2 = exp
+    // the following line put the exp value in v0 in case of chain assignment (e.g. a = b = c = 3.)
+    text << "MOVE $v0, $v2" << std::endl; // v0 = v2 = exp
 
     node.code.text = text.str();
 

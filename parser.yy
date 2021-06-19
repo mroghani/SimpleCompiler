@@ -185,18 +185,18 @@ expStmt: exp "."                   { $$ = $1; }
        ;
 
 exp: simpleExp                     { $$ = $1; }
-   | mutable "=" exp               { $$ = $3; /* TODO */}
+   | mutable "=" exp               { $$ = helpers::assign($1, $3); }
    ;
 
-simpleExp: simpleExp "|" andExp    { $$ = $1; /* TODO */}
+simpleExp: simpleExp "|" andExp    { $$ = helpers::binary_exp($1, "|", $3); }
          | andExp                  { $$ = $1; }
          ;
 
-andExp: andExp "&" unaryRelExp     { $$ = $1; /* TODO */}
+andExp: andExp "&" unaryRelExp     { $$ = helpers::binary_exp($1, "&", $3); }
       | unaryRelExp                { $$ = $1; }
       ;
 
-unaryRelExp: "!" unaryRelExp       { $$ = $2; /* TODO */}
+unaryRelExp: "!" unaryRelExp       { $$ = helpers::unary_rel_exp($2); }
            | relExp                { $$ = $1; }
            ;
 
