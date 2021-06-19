@@ -90,7 +90,8 @@ class driver;
 %nterm <std::vector<Var>>          params paramList;
 %nterm <Var>                              paramItem;
 
-%nterm <int>                unaryop sumop mulop relop;
+%nterm <int>                unaryop sumop mulop;
+%nterm <std::string>        relop;
 
 
 %nterm <Node>           constant immutable mutable exp call unaryExp factor;
@@ -199,16 +200,16 @@ unaryRelExp: "!" unaryRelExp       { $$ = $2; /* TODO */}
            | relExp                { $$ = $1; }
            ;
 
-relExp: sumExp relop sumExp        { $$ = $1; /* TODO */}
+relExp: sumExp relop sumExp        { $$ = helpers::rel_exp($1, $2, $3); }
       | sumExp                     { $$ = $1; }
       ;
       
-relop: "=="                        { $$ = 1; }
-     | "<="                        { $$ = 2; }
-     | ">="                        { $$ = 3; }
-     | "!="                        { $$ = 4; }
-     | "<"                         { $$ = 5; }
-     | ">"                         { $$ = 6; }
+relop: "=="                        { $$ = "=="; }
+     | "<="                        { $$ = "<="; }
+     | ">="                        { $$ = ">="; }
+     | "!="                        { $$ = "!="; }
+     | "<"                         { $$ = "<"; }
+     | ">"                         { $$ = ">"; }
      ;
 
 sumExp: sumExp sumop mulExp        { $$ = helpers::sum_exp($1, $2, $3); }

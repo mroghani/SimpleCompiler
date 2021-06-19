@@ -109,6 +109,41 @@ Node helpers::mul_exp(Node & left, int op, Node & right) {
     return node;
 }
 
+
+Node helpers::rel_exp(Node & left, std::string op, Node & right) {
+    Node node;
+
+    std::ostringstream text;
+    
+    text << right.code.text;
+    text << "MOVE $v1, $v0" << std::endl;
+    text << left.code.text;
+    
+    if(op == "<") {
+        text << "SLT $v0, $v0, $v1" << std::endl;
+	} else if(op == ">") {
+        text << "SLT $v0, $v1, $v0" << std::endl;
+	} else if(op == "<=") {
+        text << "SLT $v0, $v1, $v0" << std::endl;
+        text << "XORI $v0, $v0, 0x1" << std::endl;
+	} else if(op == ">=") {
+	    text << "SLT $v0, $v0, $v1" << std::endl;
+        text << "XORI $v0, $v0, 0x1" << std::endl;
+	} else if(op == "!=") {
+	    text << "XOR $v0, $v0, $v1" << std::endl;
+	    text << "SLTU $v0, $0, $v0" << std::endl;
+	} else {
+        // "=="
+        text << "XOR $v0, $v0, $v1" << std::endl;
+	    text << "SLTIU $v0, $v0, 1" << std::endl;    
+    }
+
+    node.code.text = text.str();
+
+    return node;
+}
+
+
 Node helpers::unary_exp(Node & uexp, int op) {
     if (op == 1) {
         return uexp;
