@@ -17,7 +17,7 @@ int main (int argc, char *argv[])
   // std::cerr << "here4" << std::endl;
       
   } else {
-      std::cout << "Too many arguments." << std::endl;
+      std::cout << "Too many arguments.\nformat: compiler [filepath]" << std::endl;
   }
   // std::cerr << "here4" << std::endl;
   

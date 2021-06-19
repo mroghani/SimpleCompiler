@@ -20,31 +20,43 @@ class driver {
 public:
     driver ();
 
+    // ====> LABEL
     std::string label_prefix;
     int label_counter;
     int get_label();
 
-    int curr_scope;
 
+    // ====> SCOPE
+    int curr_scope;
+    
+    void push_scope();
+    void pop_scope();
+
+
+    // ====> VARIABLES
     std::vector<std::map<std::string, Var>> variables;
 
     Var get_variable(std::string id, yy::location & loc);
     Var make_variable(std::string id, yy::location & loc, int type, int size, int initial_value);
     bool has_variable_in_scope(std::string id, int scope);
 
-    void push_scope();
-    void pop_scope();
 
+    // ====> CONSTANTS
     std::vector<Constant> constants;
 
+
+    // ====> FILE
     // Run the parser on file F.  Return 0 on success.
     int parse (const std::string& f);
     // The name of the file being parsed.
     std::string file;
 
+
+    // ====> SCANNER
     // Handling the scanner.
     void scan_begin ();
     void scan_end ();
+
     // Whether to generate scanner debug traces.
     yy::location location;
 };
