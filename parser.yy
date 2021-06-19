@@ -97,7 +97,6 @@ class driver;
 %nterm <Node>           simpleExp andExp unaryRelExp relExp sumExp mulExp;
 %nterm <Node>           programm declLists decl varDecl funcDecl expStmt;
 
-// TODO: add "varDecl: | varType ID "=" "-" constant"
 // TODO: add support for comments. ("//" == "$$" , "/* */" == "$* *$")
 // grammar
 %%
