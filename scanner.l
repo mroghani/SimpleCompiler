@@ -14,7 +14,7 @@
 
 
 id    [a-zA-Z_][a-zA-Z_0-9]*
-int   [\-][0-9]+
+int   [0-9]+
 char  "'"."'"
 blank [ \t\r]
 
