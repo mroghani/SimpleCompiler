@@ -54,11 +54,12 @@ Var driver::get_variable(std::string id, yy::location & loc) {
 }
 
 bool driver::has_variable_in_scope(std::string id, int scope) {
-  auto it = variables[scope].find(id);
-  if (it == variables[scope].end()) {
-    return false;
-  }
-  return true;
+  // auto it = variables[scope].find(id);
+  // if (it == variables[scope].end()) {
+  //   return false;
+  // }
+  // return true;
+  return variables[scope].find(id) != variables[scope].end();
 }
 
 int driver::parse (const std::string &f)
@@ -67,7 +68,7 @@ int driver::parse (const std::string &f)
   location.initialize (&file);
   scan_begin ();
   yy::parser parse (*this);
-//   parse.set_debug_level (false);
+  // parse.set_debug_level (false);
   // std::cerr << "here" << std::endl;
   int res = parse();
   // std::cerr << "here2" << std::endl;

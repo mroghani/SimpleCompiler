@@ -15,7 +15,7 @@
 
 
 %code requires {
-# include <string>
+#include <string>
 #include "types.hh"
 class driver;
 }
@@ -46,8 +46,8 @@ class driver;
   ASSIGN            "="
   MINUS             "-"
   PLUS              "+"
-  STAR              "*"
-  SLASH             "/"
+  MULT              "*"
+  DIV               "/"
   LOR               "||"
   LAND              "&&"
   AND               "&"
@@ -86,18 +86,19 @@ class driver;
 %token <int>            CHARCONST        "const char";
 %token <std::string>    ID               "identifier";
 
-%nterm <int>            varType;
-%nterm <std::vector<Var>>           params paramList;
-%nterm <Var>            paramItem;
+%nterm <int>                              varType;
+%nterm <std::vector<Var>>          params paramList;
+%nterm <Var>                              paramItem;
 
-%nterm <int>            unaryop sumop mulop relop;
+%nterm <int>                unaryop sumop mulop relop;
 
 
 %nterm <Node>           constant immutable mutable exp call unaryExp factor;
 %nterm <Node>           simpleExp andExp unaryRelExp relExp sumExp mulExp;
 %nterm <Node>           programm declLists decl varDecl funcDecl expStmt;
 
-
+// TODO: add "varDecl: | varType ID "=" "-" constant"
+// TODO: add support for comments. ("//" == "$$" , "/* */" == "$* *$")
 // grammar
 %%
 %start unit;
