@@ -1,6 +1,10 @@
 %{ /* -*- C++ -*- */
 # include <string>
 # include <climits>
+#include <iostream>
+#include <fstream>
+#include <algorithm>
+using namespace std;
 # include "driver.hh"
 # include "parser.hh"
 %}
@@ -10,6 +14,8 @@
 %{
   yy::parser::symbol_type make_INTCONST (const std::string &s, std::vector<Constant>& constants, const yy::parser::location_type& loc);
   yy::parser::symbol_type make_CHARCONST (const std::string &s, std::vector<Constant>& constants, const yy::parser::location_type& loc);
+  void token_to_file (std::string s);
+  bool cleared = false;
 %}
 
 
@@ -17,7 +23,7 @@ id    [a-zA-Z_][a-zA-Z_0-9]*
 int   [0-9]+
 char  "'"."'"
 blank [ \t\r]
-
+comment  (($\*([^*]|[\r\n]|(\*+([^*$]|[\r\n])))*\*+$)|($$.*))
 
 %{
   // Code run each time a pattern is matched.
@@ -35,58 +41,61 @@ blank [ \t\r]
   loc.step ();
 
   std::vector<Constant>& constants = drv.constants;
+
+
 %}
 
-{blank}+   loc.step ();
-\n+        loc.lines (yyleng); loc.step ();
+{comment}     token_to_file("COMMENT"); loc.lines (std::count(yytext, yytext+yyleng, '\n')); loc.step (); 
+{blank}+      loc.step ();
+\n+           loc.lines (yyleng); loc.step ();
 
-"if"          return yy::parser::make_IF                (loc);
-"else"        return yy::parser::make_ELSE              (loc);
-"elseif"      return yy::parser::make_ELSE_IF           (loc);
-"while"       return yy::parser::make_WHILE             (loc);
-"continue"    return yy::parser::make_CONTINUE          (loc);
-"break"       return yy::parser::make_BREAK             (loc);
-"for"         return yy::parser::make_FOR               (loc);
-"return"      return yy::parser::make_RETURN            (loc);
-"main"        return yy::parser::make_MAIN              (loc);
+"if"          token_to_file("IF"); return yy::parser::make_IF                (loc);
+"else"        token_to_file("ELSE"); return yy::parser::make_ELSE              (loc);
+"elseif"      token_to_file("ELSEIF"); return yy::parser::make_ELSE_IF           (loc);
+"while"       token_to_file("WHILE"); return yy::parser::make_WHILE             (loc);
+"continue"    token_to_file("CONTINUE"); return yy::parser::make_CONTINUE          (loc);
+"break"       token_to_file("BREAK"); return yy::parser::make_BREAK             (loc);
+"for"         token_to_file("FOR"); return yy::parser::make_FOR               (loc);
+"return"      token_to_file("RETURN"); return yy::parser::make_RETURN            (loc);
+"main"        token_to_file("MAIN"); return yy::parser::make_MAIN              (loc);
 
-"int"         return yy::parser::make_INT               (loc);
-"char"        return yy::parser::make_CHAR              (loc);
-"void"        return yy::parser::make_VOID              (loc);
-
-
-"="           return yy::parser::make_ASSIGN            (loc);
-"-"           return yy::parser::make_MINUS             (loc);
-"+"           return yy::parser::make_PLUS              (loc);
-"*"           return yy::parser::make_MULT              (loc);
-"/"           return yy::parser::make_DIV               (loc);
-"||"          return yy::parser::make_LOR               (loc);
-"&&"          return yy::parser::make_LAND              (loc);
-"&"           return yy::parser::make_AND               (loc);
-"|"           return yy::parser::make_OR                (loc);
-"^"           return yy::parser::make_XOR               (loc);
-"!"           return yy::parser::make_NOT               (loc);
-"<"           return yy::parser::make_LESSTHAN          (loc);
-"<="          return yy::parser::make_LESSTHANEQUAL     (loc);
-"=="          return yy::parser::make_EQUAL             (loc);
-"!="          return yy::parser::make_NOTEQUAL          (loc);
-">"           return yy::parser::make_GREATERTHAN       (loc);
-">="          return yy::parser::make_GREATERTHANEQUAL  (loc);
+"int"         token_to_file("INT"); return yy::parser::make_INT               (loc);
+"char"        token_to_file("CHAR"); return yy::parser::make_CHAR              (loc);
+"void"        token_to_file("VOID"); return yy::parser::make_VOID              (loc);
 
 
-"("           return yy::parser::make_LPAREN            (loc);
-")"           return yy::parser::make_RPAREN            (loc);
-"["           return yy::parser::make_LBRACK            (loc);
-"]"           return yy::parser::make_RBRACK            (loc);
-"{"           return yy::parser::make_LCBRACK           (loc);
-"}"           return yy::parser::make_RCBRACK           (loc);
-","           return yy::parser::make_COMMA             (loc);
-"."           return yy::parser::make_DOT               (loc);
+"="           token_to_file("ASSIGNMENT"); return yy::parser::make_ASSIGN            (loc);
+"-"           token_to_file("MINUS"); return yy::parser::make_MINUS             (loc);
+"+"           token_to_file("PLUS"); return yy::parser::make_PLUS              (loc);
+"*"           token_to_file("MULTIPLICATION"); return yy::parser::make_MULT              (loc);
+"/"           token_to_file("DIVISION"); return yy::parser::make_DIV               (loc);
+"||"          token_to_file("LOGICALOR"); return yy::parser::make_LOR               (loc);
+"&&"          token_to_file("LOGICALAND"); return yy::parser::make_LAND              (loc);
+"&"           token_to_file("AND"); return yy::parser::make_AND               (loc);
+"|"           token_to_file("OR"); return yy::parser::make_OR                (loc);
+"^"           token_to_file("XOR"); return yy::parser::make_XOR               (loc);
+"!"           token_to_file("NOT"); return yy::parser::make_NOT               (loc);
+"<"           token_to_file("LESSTHAN"); return yy::parser::make_LESSTHAN          (loc);
+"<="          token_to_file("LESSTHANEQUAL"); return yy::parser::make_LESSTHANEQUAL     (loc);
+"=="          token_to_file("EQUAL"); return yy::parser::make_EQUAL             (loc);
+"!="          token_to_file("NOTEQUAL"); return yy::parser::make_NOTEQUAL          (loc);
+">"           token_to_file("GREATERTHAN"); return yy::parser::make_GREATERTHAN       (loc);
+">="          token_to_file("GREATERTHANEQUAL"); return yy::parser::make_GREATERTHANEQUAL  (loc);
 
 
-{int}         return make_INTCONST(yytext, constants, loc);
-{char}        return make_CHARCONST(yytext, constants, loc);
-{id}          return yy::parser::make_ID(yytext, loc);
+"("           token_to_file("LEFTPARENTHESIS"); return yy::parser::make_LPAREN            (loc);
+")"           token_to_file("RIGHTPARENTHESIS"); return yy::parser::make_RPAREN            (loc);
+"["           token_to_file("LEFTBRACKET"); return yy::parser::make_LBRACK            (loc);
+"]"           token_to_file("RIGHTBRACKET"); return yy::parser::make_RBRACK            (loc);
+"{"           token_to_file("LEFTCURLYBRACKET"); return yy::parser::make_LCBRACK           (loc);
+"}"           token_to_file("RIGHTCURLYBRACKET"); return yy::parser::make_RCBRACK           (loc);
+","           token_to_file("COMMA"); return yy::parser::make_COMMA             (loc);
+"."           token_to_file("DOT"); return yy::parser::make_DOT               (loc);
+
+
+{int}         token_to_file("INT"); return make_INTCONST(yytext, constants, loc);
+{char}        token_to_file("CHAR"); return make_CHARCONST(yytext, constants, loc);
+{id}          token_to_file("ID"); return yy::parser::make_ID(yytext, loc);
 
 
 
@@ -127,6 +136,13 @@ make_CHARCONST (const std::string &s, std::vector<Constant>& constants, const yy
   return yy::parser::make_CHARCONST (idx, loc);
 }
 
+void token_to_file (std::string s){
+  ofstream tokenFile;
+  if (!cleared) {tokenFile.open("TOKEN.txt", ios::trunc); cleared = true;}
+  else tokenFile.open("TOKEN.txt", ios::app);
+  tokenFile << "TOKEN_" << s << "\n";
+  tokenFile.close();
+}
 
 void
 driver::scan_begin ()

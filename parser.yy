@@ -74,7 +74,6 @@ class driver;
 ;
 
 
-
 %token
   INT              "int"
   CHAR             "char"
@@ -98,7 +97,6 @@ class driver;
 %nterm <Node>           simpleExp andExp unaryRelExp relExp sumExp mulExp;
 %nterm <Node>           programm declLists decl funcDecl expStmt;
 
-// TODO: add support for comments. ("//" == "$$" , "/* */" == "$* *$")
 // grammar
 %%
 %start unit;
@@ -114,7 +112,6 @@ declLists: %empty                         { $$ = Node(); }
          ;
 
 decl: varDecl "."                         { $$ = Node(); }
-    | exp "."                            { $$ = $1; }
     | funcDecl                            { $$ = Node();  /* TODO */}
     ;
 
@@ -124,7 +121,7 @@ varDecl: varType ID                       { drv.make_variable($2, @2, $1, 1, 0);
        | varType ID "[" INTCONST "]"      { drv.make_variable($2, @2, $1, $4, 0); }    
        ;
 
-varType: INT   { $$ = 1; }
+varType: INT   { $$ = 1; }                
        | CHAR  { $$ = 2; }
        ;
 
