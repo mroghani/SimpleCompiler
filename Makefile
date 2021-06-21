@@ -17,4 +17,4 @@ helpers.o: helpers/helpers.hh helpers/helpers.cc
 	g++ -c helpers/helpers.cc
 
 clean:
-	rm *.o compiler parser.cc parser.hh location.hh scanner.cc
+	rm *.o compiler parser.cc parser.hh location.hh scanner.cc TOKEN.txt

@@ -40,6 +40,9 @@ class driver;
   FOR               "for"
   RETURN            "return"
   MAIN              "main"
+  SWITCH            "switch"
+  CASE              "case"
+  DEFAULT           "default"
 ;
 
 %token
@@ -96,6 +99,7 @@ class driver;
 %nterm <Node>           constant immutable mutable exp call unaryExp factor;
 %nterm <Node>           simpleExp andExp unaryRelExp relExp sumExp mulExp;
 %nterm <Node>           programm declLists decl funcDecl expStmt;
+// %nterm <Node>           cases;
 
 // grammar
 %%
@@ -155,7 +159,17 @@ stmt: expStmt
     | returnStmt
     ;
 
-selectStmt: IF "(" exp ")" "<" stmtList ">";
+selectStmt: IF "(" exp ")" "<" stmtList ">"
+          | SWITCH "(" factor ")" "<" cases ">"
+          ;
+
+cases: cases case
+     | %empty
+     ;
+
+case: CASE simpleExp ":" stmtList
+    | DEFAULT ":" stmtList
+    ;
 
 iterStmt: whileStmt
         | forStmt

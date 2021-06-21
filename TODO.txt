@@ -1,4 +1,3 @@
 Division by zero error message.
 Switch statement.
-X output: tokens.txt
 Define Node constructor.

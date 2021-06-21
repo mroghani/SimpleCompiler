@@ -58,6 +58,10 @@ comment  (($\*([^*]|[\r\n]|(\*+([^*$]|[\r\n])))*\*+$)|($$.*))
 "for"         token_to_file("FOR"); return yy::parser::make_FOR               (loc);
 "return"      token_to_file("RETURN"); return yy::parser::make_RETURN            (loc);
 "main"        token_to_file("MAIN"); return yy::parser::make_MAIN              (loc);
+"switch"      token_to_file("SWITCH"); return yy::parser::make_SWITCH             (loc);
+"case"        token_to_file("CASE"); return yy::parser::make_CASE              (loc);
+"default"     token_to_file("DEFAULT"); return yy::parser::make_DEFAULT              (loc);
+
 
 "int"         token_to_file("INT"); return yy::parser::make_INT               (loc);
 "char"        token_to_file("CHAR"); return yy::parser::make_CHAR              (loc);
