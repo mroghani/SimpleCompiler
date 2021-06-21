@@ -36,7 +36,7 @@ Var driver::make_variable(std::string id, yy::location & loc, int type, int size
   var.id = id;
   var.offset = variables.back().size();
   var.scope = curr_scope;
-  var.type = type == 1 ? Var::Type::INT : Var::Type::CHAR;
+  var.type = type == 1 ? Var::Type::INT : Var::Type::CHAR; // int = 1, char = 2
   var.initial_value = initial_value;
   variables.back()[id] = var;
   return var;
