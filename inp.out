@@ -1,6 +1,5 @@
-ADDI $v1, $sp, 0
-LW $v0, ($v1)
-MOVE $v2, $v0
-ADDI $v1, $sp, 4
-SW $v2, ($v1)
-MOVE $v0, $v2
+ADDI $v2, $sp, 4
+MOVE $v3, $v2
+ADDI $v2, $sp, 0
+LW $v0, ($v2)
+SW $v0, ($v3)

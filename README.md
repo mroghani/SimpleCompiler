@@ -20,7 +20,7 @@ The output will be stored in `[filename].out`.
 
 - Calculation experation are stored in `$v0`.
 - Mutable address are stored in `$v2`.
-- Every experation only use `$v0` and `$v1` for calculation and `$v2` to store mutable addresses.
+- Every experation only use `$v0` and `$v1` for calculation and `$v2` and `$v3` to store mutable addresses.
 
 ### Stack
 
@@ -31,5 +31,5 @@ The output will be stored in `[filename].out`.
 ### function calls
 
 First the caller put the input arguments on top of stack. and then calls the callee.
-The callee then stores the return address. then makes room for it's variables and initialize them.
+The callee then stores the return address.
 Before returning, the callee brings the stack pointer on return value.

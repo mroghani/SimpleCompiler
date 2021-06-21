@@ -35,16 +35,16 @@ Node helpers::make_mutable(driver & drv, std::string id, yy::location & loc, Nod
     // code gen:
     // find the address of mutable and put it in v1
     // if it's an array the index should be found in v0
-    // v1 = sp + (offset * 4) + (v0 * 4)
+    // v2 = sp + (offset * 4) + (v0 * 4)
 
     std::ostringstream text;
     if (ind != nullptr) {
         text << ind->code.text;
     }
-    text << "ADDI $v1, $sp, " << var.offset * 4 << std::endl; // v1 = sp + offset * 4
-    if (ind != nullptr) { // v1 = v1 + v0 * 4
+    text << "ADDI $v2, $sp, " << var.offset * 4 << std::endl; // v2 = sp + offset * 4
+    if (ind != nullptr) { // v2 = v2 + v0 * 4
         text << "SLL $v0, $v0, 2" << std::endl; // v0 = v0 * 4
-        text << "ADD $v1, $v1, $v0" << std::endl; // v1 = v1 * v0
+        text << "ADD $v2, $v2, $v0" << std::endl; // v1 = v1 * v0
     }
 
     node.code.text = text.str();
@@ -54,14 +54,14 @@ Node helpers::make_mutable(driver & drv, std::string id, yy::location & loc, Nod
 
 
 Node helpers::extract_mutable(Node & mu) {
-    // v0 = (v1)
+    // v0 = (v2)
 
     Node node;
 
     std::ostringstream text;
     
     text << mu.code.text;
-    text << "LW $v0, ($v1)" << std::endl;
+    text << "LW $v0, ($v2)" << std::endl;
 
     node.code.text = text.str();
 
@@ -203,12 +203,10 @@ Node helpers::assign(Node & mu, Node & exp) {
 
     std::ostringstream text;
     
+    text << mu.code.text; // v2 = mutable address
+    text << "MOVE $v3, $v2" << std::endl; // v3 = v2 = mutable address 
     text << exp.code.text; // v0 = exp
-    text << "MOVE $v2, $v0" << std::endl; // v2 = v0 = exp
-    text << mu.code.text; // $v1 = mutable address
-    text << "SW $v2, ($v1)" << std::endl; // mu = v2 = exp
-    // the following line put the exp value in v0 in case of chain assignment (e.g. a = b = c = 3.)
-    text << "MOVE $v0, $v2" << std::endl; // v0 = v2 = exp
+    text << "SW $v0, ($v3)" << std::endl; // mu = v0 = exp
 
     node.code.text = text.str();
 

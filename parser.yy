@@ -114,6 +114,7 @@ declLists: %empty                         { $$ = Node(); }
          ;
 
 decl: varDecl "."                         { $$ = Node(); }
+    | exp "."                            { $$ = $1; }
     | funcDecl                            { $$ = Node();  /* TODO */}
     ;
 
@@ -185,7 +186,7 @@ expStmt: exp "."                   { $$ = $1; }
        ;
 
 exp: simpleExp                     { $$ = $1; }
-   | mutable "=" exp               { $$ = helpers::assign($1, $3); }
+   | mutable "=" simpleExp               { $$ = helpers::assign($1, $3); }
    ;
 
 simpleExp: simpleExp "|" andExp    { $$ = helpers::binary_exp($1, "|", $3); }
