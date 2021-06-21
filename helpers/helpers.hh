@@ -12,6 +12,11 @@ namespace helpers
     Node sum_exp(Node & left, int op, Node & right);
     Node mul_exp(Node & left, int op, Node & right);
     Node unary_exp(Node & uexp, int op);
+    Node rel_exp(Node & left, std::string op, Node & right);
+    Node unary_rel_exp(Node & uexp);
+    Node binary_exp(Node & left, std::string op, Node & right);
+    Node assign(Node & mu, Node & exp);
+    Node merge_nodes(Node & left, Node & right);
 };
 
 #endif

@@ -90,36 +90,38 @@ class driver;
 %nterm <std::vector<Var>>          params paramList;
 %nterm <Var>                              paramItem;
 
-%nterm <int>                unaryop sumop mulop relop;
+%nterm <int>                unaryop sumop mulop;
+%nterm <std::string>        relop;
 
 
 %nterm <Node>           constant immutable mutable exp call unaryExp factor;
 %nterm <Node>           simpleExp andExp unaryRelExp relExp sumExp mulExp;
-%nterm <Node>           programm declLists decl varDecl funcDecl expStmt;
+%nterm <Node>           programm declLists decl funcDecl expStmt;
 
-// TODO: add "varDecl: | varType ID "=" "-" constant"
 // TODO: add support for comments. ("//" == "$$" , "/* */" == "$* *$")
 // grammar
 %%
 %start unit;
 
-unit: programm YYEOF                      { std::cout << "goodbye" << std::endl;  /* TODO: Output code. */}
+unit: programm YYEOF                      { drv.make_output($1); std::cout << "goodbye" << std::endl;  /* TODO: Output code. */}
 
 
 programm: declLists                       { $$ = $1; }
         ;
 
 declLists: %empty                         { $$ = Node(); }
-         | declLists decl                 { $$ = $2;  /* TODO: code gen. */}
+         | declLists decl                 { $$ = helpers::merge_nodes($1, $2); }
          ;
 
-decl: varDecl "."                         { $$ = $1; }
-    | funcDecl                            { $$ = $1;  /* TODO */}
+decl: varDecl "."                         { $$ = Node(); }
+    | exp "."                            { $$ = $1; }
+    | funcDecl                            { $$ = Node();  /* TODO */}
     ;
 
-varDecl: varType ID                       { drv.make_variable($2, @2, $1, 0, 0); $$ = Node(); }
-       | varType ID "=" constant          { drv.make_variable($2, @2, $1, 0, $4.value); $$ = Node(); }
-       | varType ID "[" INTCONST "]"      { drv.make_variable($2, @2, $1, $4, 0); $$ = Node(); /* TODO: arrays are ignored right now! */}    
+varDecl: varType ID                       { drv.make_variable($2, @2, $1, 1, 0); }
+       | varType ID "=" constant          { drv.make_variable($2, @2, $1, 1, $4.value); }
+       | varType ID "=" "-" constant      { drv.make_variable($2, @2, $1, 1, -$5.value); }
+       | varType ID "[" INTCONST "]"      { drv.make_variable($2, @2, $1, $4, 0); }    
        ;
 
 varType: INT   { $$ = 1; }
@@ -140,7 +142,7 @@ paramList: paramList "," paramItem        { $1.push_back($3); $$ = $1; }
          | paramItem                      { $$ = std::vector<Var>(1, $1); }   
          ;
 
-paramItem: varType ID                     { $$ = drv.make_variable($2, @2, $1, 0, 0); }
+paramItem: varType ID                     { $$ = drv.make_variable($2, @2, $1, 1, 0); }
          ;
 
 stmtList: varDecl "." stmtList
@@ -184,31 +186,31 @@ expStmt: exp "."                   { $$ = $1; }
        ;
 
 exp: simpleExp                     { $$ = $1; }
-   | mutable "=" exp               { $$ = $3; /* TODO */}
+   | mutable "=" simpleExp               { $$ = helpers::assign($1, $3); }
    ;
 
-simpleExp: simpleExp "|" andExp    { $$ = $1; /* TODO */}
+simpleExp: simpleExp "|" andExp    { $$ = helpers::binary_exp($1, "|", $3); }
          | andExp                  { $$ = $1; }
          ;
 
-andExp: andExp "&" unaryRelExp     { $$ = $1; /* TODO */}
+andExp: andExp "&" unaryRelExp     { $$ = helpers::binary_exp($1, "&", $3); }
       | unaryRelExp                { $$ = $1; }
       ;
 
-unaryRelExp: "!" unaryRelExp       { $$ = $2; /* TODO */}
+unaryRelExp: "!" unaryRelExp       { $$ = helpers::unary_rel_exp($2); }
            | relExp                { $$ = $1; }
            ;
 
-relExp: sumExp relop sumExp        { $$ = $1; /* TODO */}
+relExp: sumExp relop sumExp        { $$ = helpers::rel_exp($1, $2, $3); }
       | sumExp                     { $$ = $1; }
       ;
       
-relop: "=="                        { $$ = 1; }
-     | "<="                        { $$ = 2; }
-     | ">="                        { $$ = 3; }
-     | "!="                        { $$ = 4; }
-     | "<"                         { $$ = 5; }
-     | ">"                         { $$ = 6; }
+relop: "=="                        { $$ = "=="; }
+     | "<="                        { $$ = "<="; }
+     | ">="                        { $$ = ">="; }
+     | "!="                        { $$ = "!="; }
+     | "<"                         { $$ = "<"; }
+     | ">"                         { $$ = ">"; }
      ;
 
 sumExp: sumExp sumop mulExp        { $$ = helpers::sum_exp($1, $2, $3); }

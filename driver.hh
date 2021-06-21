@@ -3,6 +3,7 @@
 # include <string>
 # include <map>
 # include <set>
+# include <fstream>
 # include "types.hh" 
 # include "parser.hh"
 #include "helpers/helpers.hh"
@@ -34,6 +35,8 @@ public:
 
 
     // ====> VARIABLES
+    int global_offset;
+    int function_offset;
     std::vector<std::map<std::string, Var>> variables;
 
     Var get_variable(std::string id, yy::location & loc);
@@ -43,6 +46,13 @@ public:
 
     // ====> CONSTANTS
     std::vector<Constant> constants;
+
+    // ====> OUTPUT
+
+    void make_output(Node & node) {
+      std::ofstream out(file + ".out");
+      out << node.code.text;
+    }
 
 
     // ====> FILE
