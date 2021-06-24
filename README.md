@@ -18,9 +18,9 @@ The output will be stored in `[filename].out`.
 
 ### Register usage
 
-- Calculation experation are stored in `$v0`.
-- Mutable address are stored in `$v2`.
-- Every experation only use `$v0` and `$v1` for calculation and `$v2` and `$v3` to store mutable addresses.
+- Calculation experation are stored in `$t0`.
+- Mutable address is stored in `$t2`.
+- Every experation only use `$t0` and `$t1` for calculation and `$t2` and `$t3` to store mutable addresses.
 
 ### Stack
 
