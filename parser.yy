@@ -90,7 +90,7 @@ class driver;
 %token <std::string>    ID               "identifier";
 
 %nterm <int>                              varType;
-%nterm <std::vector<Var>>          params paramList;
+%nterm <std::vector<Var>>                 params paramList;
 %nterm <Var>                              paramItem;
 
 %nterm <int>                unaryop sumop mulop;
@@ -198,7 +198,7 @@ expStmt: exp "."                   { $$ = $1; }
        ;
 
 exp: simpleExp                     { $$ = $1; }
-   | mutable "=" simpleExp               { $$ = helpers::assign($1, $3); }
+   | mutable "=" simpleExp         { $$ = helpers::assign($1, $3); }
    ;
 
 simpleExp: simpleExp "|" andExp    { $$ = helpers::binary_exp($1, "|", $3); }
