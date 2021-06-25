@@ -7,6 +7,7 @@
 using namespace std;
 # include "driver.hh"
 # include "parser.hh"
+# include "helpers/debug.hh"
 %}
 
 %option noyywrap nounput noinput batch
@@ -15,6 +16,7 @@ using namespace std;
   yy::parser::symbol_type make_INTCONST (const std::string &s, std::vector<Constant>& constants, const yy::parser::location_type& loc);
   yy::parser::symbol_type make_CHARCONST (const std::string &s, std::vector<Constant>& constants, const yy::parser::location_type& loc);
   void token_to_file (std::string s);
+  void token_to_file (std::string s, std::string text);
   bool cleared = false;
 %}
 
@@ -45,7 +47,7 @@ comment  (($\*([^*]|[\r\n]|(\*+([^*$]|[\r\n])))*\*+$)|($$.*))
 
 %}
 
-{comment}     token_to_file("COMMENT"); loc.lines (std::count(yytext, yytext+yyleng, '\n')); loc.step (); 
+{comment}     token_to_file("COMMENT"); loc.lines (std::count(yytext, yytext+yyleng, '\n')); loc.step ();
 {blank}+      loc.step ();
 \n+           loc.lines (yyleng); loc.step ();
 
@@ -63,7 +65,7 @@ comment  (($\*([^*]|[\r\n]|(\*+([^*$]|[\r\n])))*\*+$)|($$.*))
 "default"     token_to_file("DEFAULT"); return yy::parser::make_DEFAULT              (loc);
 
 
-"int"         token_to_file("INT"); return yy::parser::make_INT               (loc);
+"int"         token_to_file("INT", std::string(yytext)); return yy::parser::make_INT               (loc);
 "char"        token_to_file("CHAR"); return yy::parser::make_CHAR              (loc);
 "void"        token_to_file("VOID"); return yy::parser::make_VOID              (loc);
 
@@ -97,7 +99,7 @@ comment  (($\*([^*]|[\r\n]|(\*+([^*$]|[\r\n])))*\*+$)|($$.*))
 "."           token_to_file("DOT"); return yy::parser::make_DOT               (loc);
 
 
-{int}         token_to_file("INT"); return make_INTCONST(yytext, constants, loc);
+{int}         token_to_file("INT", std::string(yytext)); return make_INTCONST(yytext, constants, loc);
 {char}        token_to_file("CHAR"); return make_CHARCONST(yytext, constants, loc);
 {id}          token_to_file("ID"); return yy::parser::make_ID(yytext, loc);
 
@@ -145,6 +147,14 @@ void token_to_file (std::string s){
   if (!cleared) {tokenFile.open("TOKEN.txt", ios::trunc); cleared = true;}
   else tokenFile.open("TOKEN.txt", ios::app);
   tokenFile << "TOKEN_" << s << "\n";
+  tokenFile.close();
+}
+
+void token_to_file (std::string s, std::string text){
+  ofstream tokenFile;
+  if (!cleared) {tokenFile.open("TOKEN.txt", ios::trunc); cleared = true;}
+  else tokenFile.open("TOKEN.txt", ios::app);
+  tokenFile << "TOKEN_" << s << "\t= " << text << "\n";
   tokenFile.close();
 }
 

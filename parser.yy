@@ -18,6 +18,7 @@
 #include <string>
 #include "types.hh"
 class driver;
+# include "helpers/debug.hh"
 }
 
 // The parsing context.
@@ -122,10 +123,10 @@ decl: varDecl "."                         { $$ = Node(); }
 varDecl: varType ID                       { drv.make_variable($2, @2, $1, 1, 0); }
        | varType ID "=" constant          { drv.make_variable($2, @2, $1, 1, $4.value); }
        | varType ID "=" "-" constant      { drv.make_variable($2, @2, $1, 1, -$5.value); }
-       | varType ID "[" INTCONST "]"      { drv.make_variable($2, @2, $1, $4, 0); }    
+       | varType ID "[" INTCONST "]"      { drv.make_variable($2, @2, $1, $4, 0); }
        ;
 
-varType: INT   { $$ = 1; }                
+varType: INT   { $$ = 1; }
        | CHAR  { $$ = 2; }
        ;
 
@@ -140,7 +141,7 @@ params: paramList                         { $$ = $1; }
       ;
 
 paramList: paramList "," paramItem        { $1.push_back($3); $$ = $1; }
-         | paramItem                      { $$ = std::vector<Var>(1, $1); }   
+         | paramItem                      { $$ = std::vector<Var>(1, $1); }
          ;
 
 paramItem: varType ID                     { $$ = drv.make_variable($2, @2, $1, 1, 0); }
@@ -215,7 +216,7 @@ unaryRelExp: "!" unaryRelExp       { $$ = helpers::unary_rel_exp($2); }
 relExp: sumExp relop sumExp        { $$ = helpers::rel_exp($1, $2, $3); }
       | sumExp                     { $$ = $1; }
       ;
-      
+
 relop: "=="                        { $$ = "=="; }
      | "<="                        { $$ = "<="; }
      | ">="                        { $$ = ">="; }
@@ -248,8 +249,8 @@ unaryop: "+"                { $$ = 1; }
        | "-"                { $$ = -1; }
        ;
 
-factor: immutable           { $$ = $1;} 
-      | mutable             { $$ = helpers::extract_mutable($1); }
+factor: immutable           { ddd&&printf("[parser]=> immutable found\n");$$ = $1;}
+      | mutable             { ddd&&printf("[parser]=> mutable found\n");$$ = helpers::extract_mutable($1); }
       ;
 
 mutable: ID                 { $$ = helpers::make_mutable(drv, $1, @1, nullptr); }
@@ -257,7 +258,7 @@ mutable: ID                 { $$ = helpers::make_mutable(drv, $1, @1, nullptr); 
        ;
 
 immutable: "(" exp ")"      { $$ = $2; }
-         | call             { 
+         | call             {
                               if ($1.type == Node::Type::VOID) {
                                      error(@1, "void type can not be used as immutable.");
                               }
