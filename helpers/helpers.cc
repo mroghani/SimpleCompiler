@@ -6,19 +6,20 @@
 
 
 
-Node helpers::make_constant(const Constant& c) {
+Node helpers::load_constant(const Constant& c) {
     Node node;
     ddd&&std::cout << "[helpers]=> make_constant\t val=\t" << c.value << "\t type:\t" << c.type << std::endl;
-    if (c.type == Constant::Type::INT) {
-        node.type = Node::Type::INT;
-    } else {
-        node.type = Node::Type::CHAR;
-    }
+    // if (c.type == Constant::Type::INT) {
+    //     node.type = Node::Type::INT;
+    // } else {
+    //     node.type = Node::Type::CHAR;
+    // }
 
 
-    // LI t0 {CONSTANT}
+    // Push the constant value on stack.
     std::ostringstream text;
-    text << "LI $t0, " << c.value << std::endl;
+    text << "LI $sp, " << c.value << std::endl;
+    text << "SUBI $sp, " << 4 << std::endl;
 
 
     node.code.text = text.str();
@@ -28,27 +29,52 @@ Node helpers::make_constant(const Constant& c) {
 }
 
 
-Node helpers::make_mutable(driver & drv, std::string id, yy::location & loc, Node *ind) {
+Node helpers::load_mutable(driver & drv, std::string id, yy::location & loc, Node *ind) {
 
     Node node;
 
     auto var = drv.get_variable(id, loc);
-    ddd&&std::cout << "[helpers]=> make_mutable:\tid:\t" << id << "\t" << std::endl;
+    ddd&&std::cout << "[helpers]=> load_mutable:\tid:\t" << id << "\t" << std::endl;
 
     // code gen:
-    // find the address of mutable and put it in t1
-    // if it's an array the index should be found in t0
-    // t2 = sp + (offset * 4) + (t0 * 4)
 
     std::ostringstream text;
+    
+    // find offset
+    
+    // pushing the offset to stack.
+    text << "LI $sp, " << var.offset * 4 << std::endl;
+    text << "SUBI $sp, " << 4 << std::endl;
+    
+    // if it is an array we push the index to stack as well. and then add it to offset.
     if (ind != nullptr) {
-        text << ind->code.text;
+        text << ind->code.text; // index is on top of stack.
+        //loading offset and index into registers.
+        text << "LW $t0, 4($sp)" << std::endl;
+        text << "LW $t1, ($sp)" << std::endl; 
+        // adding them together and modifying the sp.
+        text << "ADD $t0, $t0, $t1" << std::endl;
+        text << "ADDI $sp, 4" << std::endl;
+        text << "SW $t0, ($sp)" << std::endl;
     }
-    text << "ADDI $t2, $sp, " << var.offset * 4 << std::endl; // t2 = sp + offset * 4
-    if (ind != nullptr) { // t2 = t2 + t0 * 4
-        text << "SLL $t0, $t0, 2" << std::endl; // t0 = t0 * 4
-        text << "ADD $t2, $t2, $t0" << std::endl; // t1 = t1 * t0
+    // load (base + offset) ==> sp
+
+    // load variable
+    
+    // load base
+    if (var.scope == 0) {
+        // if var is global
+        text << "LW $t1, ($s0)" << std::endl; // load base
+    } else {
+        // if var is local
+        text << "LW $t1, ($s1)" << std::endl; // load base
     }
+    
+    text << "LW $t0, ($sp)" << std::endl; // load offset 
+    text << "ADD $t0, $t0, $t1" << std::endl; // $t0 = base + offset
+    text << "SW $t0, ($sp)" << std::endl; // store the mutable address in stack
+
+
 
     node.code.text = text.str();
 
@@ -57,14 +83,14 @@ Node helpers::make_mutable(driver & drv, std::string id, yy::location & loc, Nod
 
 
 Node helpers::extract_mutable(Node & mu) {
-    // t0 = (t2)
 
     Node node;
 
     std::ostringstream text;
 
-    text << mu.code.text;
-    text << "LW $t0, ($t2)" << std::endl;
+    text << mu.code.text; // get mutable address.
+    text << "LW $t0, ($sp)" << std::endl; // load variable value in $t0
+    text << "SW $t0, ($sp)" << std::endl; // put it in stack.
 
     node.code.text = text.str();
 

@@ -6,8 +6,8 @@
 
 namespace helpers
 {
-    Node make_constant(const Constant& c);
-    Node make_mutable(driver& drv, std::string id, yy::location & loc, Node *ind);
+    Node load_constant(const Constant& c);
+    Node load_mutable(driver& drv, std::string id, yy::location & loc, Node *ind);
     Node extract_mutable(Node & mu);
     Node sum_exp(Node & left, int op, Node & right);
     Node mul_exp(Node & left, int op, Node & right);

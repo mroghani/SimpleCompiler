@@ -7,5 +7,3 @@ location.hh
 scanner.cc
 
 TOKEN.txt
-inp
-inp.out

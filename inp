@@ -1,12 +1,6 @@
 int s.
 
-
-void f(int a, int s) <
->
-
 int ss.
-
-ss= s.
 
 char fc (char c, int s) <
     int x.
@@ -17,5 +11,16 @@ char fc (char c, int s) <
 char cs = 'a'.
 
 
+int f(int a) <
+    if (a == 0) <return 0.>
+    return f(a - 1) + a.
+>
+
+
+
+
 int main() <
 >
+
+
+

@@ -96,8 +96,9 @@ class driver;
 %nterm <int>                unaryop sumop mulop;
 %nterm <std::string>        relop;
 
+%nterm <Constant>       constant;
 
-%nterm <Node>           constant immutable mutable exp call unaryExp factor;
+%nterm <Node>           immutable mutable exp call unaryExp factor;
 %nterm <Node>           simpleExp andExp unaryRelExp relExp sumExp mulExp;
 %nterm <Node>           programm declLists decl funcDecl expStmt;
 // %nterm <Node>           cases;
@@ -253,8 +254,8 @@ factor: immutable           { ddd&&printf("[parser]=> immutable found\n");$$ = $
       | mutable             { ddd&&printf("[parser]=> mutable found\n");$$ = helpers::extract_mutable($1); }
       ;
 
-mutable: ID                 { $$ = helpers::make_mutable(drv, $1, @1, nullptr); }
-       | ID "[" exp "]"     { $$ = helpers::make_mutable(drv, $1, @1, &$3); }
+mutable: ID                 { $$ = helpers::load_mutable(drv, $1, @1, nullptr); }
+       | ID "[" exp "]"     { $$ = helpers::load_mutable(drv, $1, @1, &$3); }
        ;
 
 immutable: "(" exp ")"      { $$ = $2; }
@@ -264,10 +265,10 @@ immutable: "(" exp ")"      { $$ = $2; }
                               }
                               $$ = $1; // TODO
                             }
-         | constant         { $$ = $1; }
+         | constant         { $$ = helpers::load_constant($1); }
          ;
 
-call: ID "(" args ")"       { $$ = helpers::make_mutable(drv, $1, @1, nullptr); // TODO: COMOLETE BULLSHIT
+call: ID "(" args ")"       { $$ = helpers::load_mutable(drv, $1, @1, nullptr); // TODO: COMOLETE BULLSHIT
                             }
     ;
 
@@ -279,8 +280,8 @@ argList: argList "," exp
        | exp
        ;
 
-constant: INTCONST          { $$ = helpers::make_constant(drv.constants[$1]); }
-        | CHARCONST         { $$ = helpers::make_constant(drv.constants[$1]); }
+constant: INTCONST          { $$ = drv.constants[$1]; }
+        | CHARCONST         { $$ = drv.constants[$1]; }
         ;
 
 
