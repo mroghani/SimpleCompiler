@@ -1,11 +1,54 @@
 #include "helpers.hh"
-#include "mips_helpers.hh"
 #include "../parser.hh"
 #include <sstream>
 #include "../driver.hh"
 #include "debug.hh"
 
 
+
+
+
+
+
+std::string stackmore(int amount=1){
+    // return "SUBI $sp, " + std::to_string(-4*amount) + "\n";
+    return "addiu $sp, $sp, " + std::to_string(-4*amount) + "\n";
+}
+std::string stackless(int amount=1){
+    // return "ADDI $sp, " + std::to_string(4*amount) + "\n";
+    return "addiu $sp, $sp, " + std::to_string(4*amount) + "\n";
+}
+// std::string mips::stackpush(int value){
+//     return "li $sp, " + std::to_string(value) << "\n";
+// }
+// std::string mips::stackpush(int value, int offset=0){
+//     return "li " + std::to_string(4*value) + "($sp), " + std::to_string(value) + "\n";
+// }
+// std::string mips::stackpop(std::string destination, int offset=0){
+//     return "lw "+ destination + ", " + std::to_string(-4*offset) + "($sp)" + "\n";
+// }
+
+std::string li(int register_number, int value){
+    return "li $" + std::to_string(register_number) + ", " + std::to_string(value) + "\n";
+}
+std::string sw(int register_number, std::string destination){
+    return "li $" + std::to_string(register_number) + ", " + destination + "\n";
+}
+std::string lw(int register_number, std::string source){
+    return "lw $" + std::to_string(register_number) + ", " + source + "\n";
+}
+std::string sp(int offset = 0){
+    if (offset)
+        return std::to_string(4 * offset) + "($sp)";
+    else
+        return "$sp";
+}
+std::string fp(int offset = 0){
+    if (offset)
+        return std::to_string(4 * offset) + "($fp)";
+    else
+        return "$fp";
+}
 
 
 Node helpers::load_constant(const Constant& c) {
@@ -22,8 +65,8 @@ Node helpers::load_constant(const Constant& c) {
     std::ostringstream text;
     // text << "LI $sp, " << c.value << std::endl;
     // text << "SUBI $sp, " << 4 << std::endl;
-    text << mips::stackpush(c.value);
-
+    // text << mips::stackpush(c.value);
+    text << stackmore(1) << li(3, c.value) << sw(3, sp(1));
 
     node.code.text = text.str();
 
@@ -129,9 +172,9 @@ Node helpers::mul_exp(Node & left, int op, Node & right) {
     text << right.code.text;
     text << "MOVE $t1, $t0" << std::endl;
     text << left.code.text;
-    if (op == 1) {
+    if (op == 1) { // if "*"
         text << "MUL $t0, $t0, $t1" << std::endl;
-    } else {
+    } else { // if "/"
         text << "DIV $t0, $t1" << std::endl;
         text << "MFLO $t0" << std::endl;
     }
