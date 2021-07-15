@@ -65,7 +65,7 @@ comment  (($\*([^*]|[\r\n]|(\*+([^*$]|[\r\n])))*\*+$)|($$.*))
 "default"     token_to_file("DEFAULT"); return yy::parser::make_DEFAULT              (loc);
 
 
-"int"         token_to_file("INT", std::string(yytext)); return yy::parser::make_INT               (loc);
+"int"         token_to_file("INT"); return yy::parser::make_INT               (loc);
 "char"        token_to_file("CHAR"); return yy::parser::make_CHAR              (loc);
 "void"        token_to_file("VOID"); return yy::parser::make_VOID              (loc);
 
@@ -99,7 +99,7 @@ comment  (($\*([^*]|[\r\n]|(\*+([^*$]|[\r\n])))*\*+$)|($$.*))
 "."           token_to_file("DOT"); return yy::parser::make_DOT               (loc);
 
 
-{int}         token_to_file("INT", std::string(yytext)); return make_INTCONST(yytext, constants, loc);
+{int}         token_to_file("INT"); return make_INTCONST(yytext, constants, loc);
 {char}        token_to_file("CHAR"); return make_CHARCONST(yytext, constants, loc);
 {id}          token_to_file("ID"); return yy::parser::make_ID(yytext, loc);
 

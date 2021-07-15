@@ -6,11 +6,11 @@
 struct Code
 {
     std::string text;
-    // int continue_label;
-    // int break_label;
-    // int case_label;
-    int start_label;
-    int end_label;
+    // std::string continue_label;
+    // std::string break_label;
+    // std::string case_label;
+    std::string start_label;
+    std::string end_label;
 
     /**
      *  start_label:   LI $s0, 12

@@ -4,7 +4,7 @@
 # include <map>
 # include <set>
 # include <fstream>
-# include "types.hh" 
+# include "types.hh"
 # include "parser.hh"
 #include "helpers/helpers.hh"
 
@@ -24,12 +24,12 @@ public:
     // ====> LABEL
     std::string label_prefix;
     int label_counter;
-    int get_label();
+    std::string get_label();
 
 
     // ====> SCOPE
     int curr_scope;
-    
+
     void push_scope();
     void pop_scope();
 

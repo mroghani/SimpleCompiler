@@ -10,8 +10,11 @@ driver::driver () {
   push_scope();
 }
 
-int driver::get_label () {
-  return label_counter++;
+std::string driver::get_label () {
+  std::string label = label_prefix;
+  label_counter++;
+  label = label + std::to_string(label_counter);
+  return label;
 }
 
 void driver::push_scope () {
