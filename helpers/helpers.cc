@@ -9,40 +9,53 @@
 
 
 
-
+// Increases stack size and allocates more memory.
+// amount > 0
 std::string stackmore(int amount=1){
     // return "SUBI $sp, " + std::to_string(-4*amount) + "\n";
     return "addiu $sp, $sp, " + std::to_string(-4*amount) + "\n";
 }
+
+// Decreases stack size and deallocates memory.
+// amount > 0
 std::string stackless(int amount=1){
     // return "ADDI $sp, " + std::to_string(4*amount) + "\n";
     return "addiu $sp, $sp, " + std::to_string(4*amount) + "\n";
 }
-// std::string mips::stackpush(int value){
-//     return "li $sp, " + std::to_string(value) << "\n";
-// }
-// std::string mips::stackpush(int value, int offset=0){
-//     return "li " + std::to_string(4*value) + "($sp), " + std::to_string(value) + "\n";
-// }
-// std::string mips::stackpop(std::string destination, int offset=0){
-//     return "lw "+ destination + ", " + std::to_string(-4*offset) + "($sp)" + "\n";
-// }
 
+// Loads a number into a register.
 std::string li(int register_number, int value){
     return "li $" + std::to_string(register_number) + ", " + std::to_string(value) + "\n";
 }
+
+// Stores value of a register in an address (destination) .
 std::string sw(int register_number, std::string destination){
     return "li $" + std::to_string(register_number) + ", " + destination + "\n";
 }
+// Loads value of an address (destination) into a register.
 std::string lw(int register_number, std::string source){
     return "lw $" + std::to_string(register_number) + ", " + source + "\n";
 }
+// Loads value of an address (destination) in another address or register.
+std::string lw(std::string destination, std::string source){
+    return "lw " + destination + ", " + source + "\n";
+}
+// Copies the contents of source (arg #2) to destination (arg #1).
+std::string move(std::string destination, std::string source){
+    return "move " + destination + ", " + source + "\n";
+}
+// Jumps to the instruction pointed to by $31.
+std::string ret(){
+    return "j $31";
+}
+// Returns "?($sp)" or "$sp"
 std::string sp(int offset = 0){
     if (offset)
         return std::to_string(4 * offset) + "($sp)";
     else
         return "$sp";
 }
+// Returns "?($fp)" or "$fp"
 std::string fp(int offset = 0){
     if (offset)
         return std::to_string(4 * offset) + "($fp)";

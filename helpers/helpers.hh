@@ -21,14 +21,12 @@ namespace helpers
 
 std::string stackmore(int amount);
 std::string stackless(int amount);
-
-// std::string stackpush(int value);
-// std::string stackpush(int value, int offset);
-std::string stackpop(int offset);
-// std::string storerhs();
 std::string li(int register_number, int value);
 std::string sw(int register_number, std::string destination);
 std::string lw(int register_number, std::string source);
+std::string lw(std::string destination, std::string source);
+std::string move(std::string destination, std::string source);
+std::string ret();
 std::string sp(int offset);
 std::string fp(int offset);
 
