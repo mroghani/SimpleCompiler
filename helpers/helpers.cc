@@ -1,8 +1,10 @@
 #include "helpers.hh"
+#include "mips_helpers.hh"
 #include "../parser.hh"
 #include <sstream>
 #include "../driver.hh"
 #include "debug.hh"
+
 
 
 
@@ -18,8 +20,9 @@ Node helpers::load_constant(const Constant& c) {
 
     // Push the constant value on stack.
     std::ostringstream text;
-    text << "LI $sp, " << c.value << std::endl;
-    text << "SUBI $sp, " << 4 << std::endl;
+    // text << "LI $sp, " << c.value << std::endl;
+    // text << "SUBI $sp, " << 4 << std::endl;
+    text << mips::stackpush(c.value);
 
 
     node.code.text = text.str();
@@ -39,19 +42,19 @@ Node helpers::load_mutable(driver & drv, std::string id, yy::location & loc, Nod
     // code gen:
 
     std::ostringstream text;
-    
+
     // find offset
-    
+
     // pushing the offset to stack.
     text << "LI $sp, " << var.offset * 4 << std::endl;
     text << "SUBI $sp, " << 4 << std::endl;
-    
+
     // if it is an array we push the index to stack as well. and then add it to offset.
     if (ind != nullptr) {
         text << ind->code.text; // index is on top of stack.
         //loading offset and index into registers.
         text << "LW $t0, 4($sp)" << std::endl;
-        text << "LW $t1, ($sp)" << std::endl; 
+        text << "LW $t1, ($sp)" << std::endl;
         // adding them together and modifying the sp.
         text << "ADD $t0, $t0, $t1" << std::endl;
         text << "ADDI $sp, 4" << std::endl;
@@ -60,7 +63,7 @@ Node helpers::load_mutable(driver & drv, std::string id, yy::location & loc, Nod
     // load (base + offset) ==> sp
 
     // load variable
-    
+
     // load base
     if (var.scope == 0) {
         // if var is global
@@ -69,8 +72,8 @@ Node helpers::load_mutable(driver & drv, std::string id, yy::location & loc, Nod
         // if var is local
         text << "LW $t1, ($s1)" << std::endl; // load base
     }
-    
-    text << "LW $t0, ($sp)" << std::endl; // load offset 
+
+    text << "LW $t0, ($sp)" << std::endl; // load offset
     text << "ADD $t0, $t0, $t1" << std::endl; // $t0 = base + offset
     text << "SW $t0, ($sp)" << std::endl; // store the mutable address in stack
 
