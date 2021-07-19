@@ -15,19 +15,16 @@ std::string stackmore(int amount=1){
     // return "SUBI $sp, " + std::to_string(-4*amount) + "\n";
     return "addiu $sp, $sp, " + std::to_string(-4*amount) + "\n";
 }
-
 // Decreases stack size and deallocates memory.
 // amount > 0
 std::string stackless(int amount=1){
     // return "ADDI $sp, " + std::to_string(4*amount) + "\n";
     return "addiu $sp, $sp, " + std::to_string(4*amount) + "\n";
 }
-
 // Loads a number into a register.
 std::string li(int register_number, int value){
     return "li $" + std::to_string(register_number) + ", " + std::to_string(value) + "\n";
 }
-
 // Stores value of a register in an address (destination) .
 std::string sw(int register_number, std::string destination){
     return "li $" + std::to_string(register_number) + ", " + destination + "\n";
