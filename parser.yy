@@ -132,7 +132,7 @@ varType: INT   { $$ = 1; }
        ;
 
 funcDecl: varType ID { drv.push_scope(); }
-          "(" params ")" "<" stmtList ">"  { drv.pop_scope(); }
+          "(" params ")" "<" stmtList ">"  { /** make function **/ drv.pop_scope(); }
         | VOID ID { drv.push_scope(); } "(" params ")" "<" stmtList ">" { drv.pop_scope(); }
         | INT MAIN { drv.push_scope(); } "(" <std::vector<Var>>{$$ = std::vector<Var>();} ")" "<" stmtList ">" { drv.pop_scope(); }
         ;
@@ -199,7 +199,7 @@ expStmt: exp "."                   { $$ = $1; }
        ;
 
 exp: simpleExp                     { $$ = $1; }
-   | mutable "=" simpleExp         { $$ = helpers::assign($1, $3); }
+   | mutable "=" simpleExp         { $$ = helpers::assign($1, $3); } // TODO assignment chain
    ;
 
 simpleExp: simpleExp "|" andExp    { $$ = helpers::binary_exp($1, "|", $3); }
@@ -250,8 +250,8 @@ unaryop: "+"                { $$ = 1; }
        | "-"                { $$ = -1; }
        ;
 
-factor: immutable           { ddd&&printf("[parser]=> immutable found\n");$$ = $1;}
-      | mutable             { ddd&&printf("[parser]=> mutable found\n");$$ = helpers::extract_mutable($1); }
+factor: immutable           { ddd&&printf("[parser]=> immutable found\n"); $$ = $1;}
+      | mutable             { ddd&&printf("[parser]=> mutable found\n"); $$ = helpers::load_mutable_value($1); }
       ;
 
 mutable: ID                 { $$ = helpers::load_mutable(drv, $1, @1, nullptr); }
