@@ -1,6 +1,11 @@
 
+int f() <
+    return 4.
+>
+
 int main() <
-return 0.
+if (1 == 2) <return 7.> elseif (4 == 5) <return 11.> else < return 13. >
+return f().
 >
 
 

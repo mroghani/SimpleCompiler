@@ -19,9 +19,9 @@ struct Node
 
     enum Type
     {
-        VOID,
         INT,
-        CHAR
+        CHAR,
+        VOID
     } type;
     int value;
 };

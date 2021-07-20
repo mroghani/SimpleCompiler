@@ -372,7 +372,7 @@ Node helpers::return_stmt(driver &drv, yy::location &loc, Node * exp) {
 
     text << lw("s0", reg_offset("s0", 1))
             << lw("ra", reg_offset("s0", 2))
-            << lw("sp", "s0")
+            << move("sp", "s0")
             << stackless(2)
             << "JR $ra\n";
     
@@ -399,13 +399,71 @@ Node helpers::create_function(Function func, Node & stmts) {
         
     // Load args
     for (int i = 0; i < func.number_of_arguments; i++) {
-        std::string rname = "a0";
-        rname[1] = '0' + i; 
-        text << sw(rname, reg_offset("s0", -i));
+        text << sw("a" + std::to_string(i), reg_offset("s0", -i));
     }
 
 
     text << stmts.code.text;
+
+    node.code.text = text.str();
+
+    return node;
+}
+
+Node helpers::call_function(driver &drv, std::string id, yy::location &loc, std::vector<Node> args){
+    
+    Function func = drv.get_function(id, loc);
+
+    if (func.number_of_arguments > args.size()) {
+            throw yy::parser::syntax_error(loc, "Too few arguments, expected " + std::to_string(args.size()) + " arguments.");
+    } 
+    if (func.number_of_arguments < args.size()) {
+            throw yy::parser::syntax_error(loc, "Too many arguments, expected " + std::to_string(args.size()) + " arguments.");
+    } 
+    
+    Node node;
+    // find fucntion, find out number of args and space needed, import args from registers, import the code in 'text', 
+    std::ostringstream text;
+
+    
+    for(auto arg : args) {
+        text << arg.code.text;
+    }
+
+    for (int i = 0; i < args.size(); i++) {
+        text << lw("a" + std::to_string(i), sp(args.size() - i - 1));
+    }
+
+    text << stackless(args.size() - 1);
+
+    text << "JAL " << func.id;
+
+    text << sw("v0", sp(0));
+
+    node.code.text = text.str();
+
+    return node;
+}
+
+
+Node helpers::make_if_stmt(driver &drv, Node& condition, Node& stmts, Node& elifclause, std::string endLabel, bool printEndLabel) {
+    Node node;
+    std::ostringstream text;
+
+    std::string falseLabel = drv.get_label();
+    // std::string endLabel = drv.get_label();
+    
+    text << condition.code.text
+         << lw("t0", sp(0))
+         << stackless()
+         << "BEQZ $t0, " << falseLabel << std::endl
+         << stmts.code.text
+         << "B " << endLabel << std::endl
+         << falseLabel << ":" << std::endl
+         << elifclause.code.text;
+
+    if (printEndLabel)
+        text << endLabel << ":" << std::endl;
 
 
     node.code.text = text.str();

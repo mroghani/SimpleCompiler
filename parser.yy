@@ -103,6 +103,13 @@ class driver;
 %nterm <Node>           programm declLists decl funcDecl expStmt;
 %nterm <Node>           returnStmt;
 %nterm <Node>           stmt stmtList;
+%nterm <Node>           selectStmt elseifclause;
+
+%nterm <std::vector<Node>> argList args;
+
+
+
+
 
 // %nterm <Node>           cases;
 
@@ -165,18 +172,22 @@ stmtList: varDecl "." stmtList     { $$ = $3; }
 
 stmt: expStmt                      { $$ = $1; }
     | returnStmt                   { $$ = $1; }
+    | selectStmt                   { $$ = $1; }
+    | iterStmt                     { $$ = Node(); }
+    | breakStmt                    { $$ = Node(); }
+    | continueStmt                 { $$ = Node(); }
     ;
 
- /* | selectStmt
-    | iterStmt
-    | breakStmt
-    | continueStmt
- */   
     
-selectStmt: IF "(" exp ")" "<" stmtList ">"
-          | SWITCH "(" factor ")" "<" cases ">"
+selectStmt: IF "(" exp ")" <std::string>{ $$ = drv.get_label(); } "<" stmtList ">" elseifclause        { $$ = helpers::make_if_stmt(drv, $3, $7, $9, $5, true); }
+          | SWITCH "(" factor ")" "<" cases ">"                 { $$ = Node(); } // TODO
           ;
 
+elseifclause: ELSE_IF "(" exp ")" <std::string>{ $$ = $<std::string>-3; } "<" stmtList ">" elseifclause  { $$ = helpers::make_if_stmt(drv, $3, $7, $9, $5, false); }
+            | ELSE "<" stmtList ">"                             { $$ = $3; }
+            | %empty                                            { $$ = Node(); }
+            ;
+       
 cases: cases case
      | %empty
      ;
@@ -275,21 +286,20 @@ immutable: "(" exp ")"      { $$ = $2; }
                               if ($1.type == Node::Type::VOID) {
                                      error(@1, "void type can not be used as immutable.");
                               }
-                              $$ = $1; // TODO
+                              $$ = $1;
                             }
          | constant         { $$ = helpers::load_constant($1); }
          ;
 
-call: ID "(" args ")"       { $$ = helpers::load_mutable(drv, $1, @1, nullptr); // TODO: COMOLETE BULLSHIT
-                            }
+call: ID "(" args ")"       { $$ = helpers::call_function(drv, $1, @1, $3); $$.type = (Node::Type)drv.Functions[$1].type; }
     ;
 
-args: %empty
-    | argList
+args: %empty                { $$ = std::vector<Node>(); }
+    | argList               { $$ = $1; }
     ;
 
-argList: argList "," exp
-       | exp
+argList: argList "," exp    { $1.push_back($3); $$ = $1;}
+       | exp                { $$ = std::vector<Node>(); $$.push_back($1); }
        ;
 
 constant: INTCONST          { $$ = drv.constants[$1]; }

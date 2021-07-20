@@ -19,8 +19,9 @@ namespace helpers
     Node merge_nodes(Node &left, Node &right);
 
     Node create_function(Function func, Node & stmts);
-
+    Node call_function(driver &drv, std::string id, yy::location &loc, std::vector<Node> args);
     Node return_stmt(driver &drv, yy::location &loc, Node * exp);
+    Node make_if_stmt(driver &drv, Node& condition, Node& stmts, Node& elifclause, std::string endLabel, bool printEndLabel);
 };
 
 std::string stackmore(int amount);
@@ -40,5 +41,7 @@ std::string reg_offset(std::string reg, int offset);
 std::string addregisters(std::string destination, std::string source1, std::string source2);
 std::string subregisters(std::string destination, std::string source1, std::string source2);
 std::string addimmediate(std::string destination, std::string source, int amount);
+
+
 
 #endif
