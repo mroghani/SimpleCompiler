@@ -190,7 +190,7 @@ continueStmt: CONTINUE "."
             ;
 
 returnStmt: RETURN "."
-          | RETURN exp "."
+          | RETURN simpleExp "."
           ;
 
 
