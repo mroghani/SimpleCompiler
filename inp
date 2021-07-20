@@ -2,9 +2,15 @@
 int f() <
     return 4.
 >
-
+int v = 2.
 int main() <
-if (1 == 2) <return 7.> elseif (4 == 5) <return 11.> else < return 13. >
+$$ if (1 == 2) <return 7.> elseif (4 == 5) <return 11.> else < return 13. >
+int i = 0.
+while (i != 3)<
+for (int j = 0. j < 5. j = j + 5) <
+    
+>
+>
 return f().
 >
 

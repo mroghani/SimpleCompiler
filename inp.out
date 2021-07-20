@@ -1,89 +1,82 @@
+.text
+		MOVE	$s0,	$sp
+		addiu	$sp,	$sp,	-4
+		B	main
 f:
-addiu $sp, $sp, -12
-sw $ra, 8($sp)
-sw $s0, 4($sp)
-lw $s0, $sp
-addiu $sp, $sp, -4
-li $t0, 4
-sw $t0, $sp
-lw $v0, $sp
-lw $s0, $4($s0)
-lw $ra, $8($s0)
-move sp, s0
-addiu $sp, $sp, 8
-JR $ra
+		addiu	$sp,	$sp,	-12
+		sw	$ra,	8($sp)
+		sw	$s1,	4($sp)
+		lw	$s1,	$sp
+		addiu	$sp,	$sp,	-4
+		li	$t0,	4
+		sw	$t0,	$sp
+		lw	$v0,	$sp
+		move	a0,	v0
+		li	$v0,	4
+		syscall
 main:
-addiu $sp, $sp, -12
-sw $ra, 8($sp)
-sw $s0, 4($sp)
-lw $s0, $sp
-addiu $sp, $sp, -4
-li $t0, 1
-sw $t0, $sp
-addiu $sp, $sp, -4
-li $t0, 2
-sw $t0, $sp
-lw $t0, $sp
-lw $t1, $4($sp)
-XOR $t0, $t0, $t1
-SLTIU $t0, $t0, 1
-addiu $sp, $sp, 4
-sw $t0, $sp
-lw $t0, $sp
-addiu $sp, $sp, 4
-BEQZ $t0, Label_3
-addiu $sp, $sp, -4
-li $t0, 7
-sw $t0, $sp
-lw $v0, $sp
-lw $s0, $4($s0)
-lw $ra, $8($s0)
-move sp, s0
-addiu $sp, $sp, 8
-JR $ra
-B Label_1
-Label_3:
-addiu $sp, $sp, -4
-li $t0, 4
-sw $t0, $sp
-addiu $sp, $sp, -4
-li $t0, 5
-sw $t0, $sp
-lw $t0, $sp
-lw $t1, $4($sp)
-XOR $t0, $t0, $t1
-SLTIU $t0, $t0, 1
-addiu $sp, $sp, 4
-sw $t0, $sp
-lw $t0, $sp
-addiu $sp, $sp, 4
-BEQZ $t0, Label_2
-addiu $sp, $sp, -4
-li $t0, 11
-sw $t0, $sp
-lw $v0, $sp
-lw $s0, $4($s0)
-lw $ra, $8($s0)
-move sp, s0
-addiu $sp, $sp, 8
-JR $ra
-B Label_1
-Label_2:
-addiu $sp, $sp, -4
-li $t0, 13
-sw $t0, $sp
-lw $v0, $sp
-lw $s0, $4($s0)
-lw $ra, $8($s0)
-move sp, s0
-addiu $sp, $sp, 8
-JR $ra
+		addiu	$sp,	$sp,	-12
+		sw	$ra,	8($sp)
+		sw	$s1,	4($sp)
+		lw	$s1,	$sp
 Label_1:
-addiu $sp, $sp, -4
-JAL fsw $v0, $sp
-lw $v0, $sp
-lw $s0, $4($s0)
-lw $ra, $8($s0)
-move sp, s0
-addiu $sp, $sp, 8
-JR $ra
+		lw	$t0,	$sp
+		lw	$t0,	$t0
+		sw	$t0,	$sp
+		addiu	$sp,	$sp,	-4
+		li	$t0,	3
+		sw	$t0,	$sp
+		lw	$t0,	$sp
+		lw	$t1,	$4($sp)
+		XOR	$t0,	$t0,	$t1
+		SLTU	$t0,	$0,	$t0
+		addiu	$sp,	$sp,	4
+		sw	$t0,	$sp
+		lw	$t0,	$sp
+		addiu	$sp,	$sp,	4
+		BEQZ	$t0,	Label_2
+		B	Label_5
+Label_3:
+		lw	$t0,	$sp
+		lw	$t0,	$t0
+		sw	$t0,	$sp
+		addiu	$sp,	$sp,	-4
+		li	$t0,	5
+		sw	$t0,	$sp
+		lw	$t0,	$sp
+		lw	$t1,	$4($sp)
+		ADDU	$t0,	$t0,	$t1
+		addiu	$sp,	$sp,	4
+		sw	$t0,	$sp
+		ADDIU	$t0,	$s1,	-4
+		addiu	$sp,	$sp,	-4
+		sw	$t0,	$sp
+		lw	$t1,	$4($sp)
+		lw	$t0,	$sp
+		sw	$t1,	t0
+		addiu	$sp,	$sp,	8
+Label_5:
+		lw	$t0,	$sp
+		lw	$t0,	$t0
+		sw	$t0,	$sp
+		addiu	$sp,	$sp,	-4
+		li	$t0,	5
+		sw	$t0,	$sp
+		lw	$t0,	$sp
+		lw	$t1,	$4($sp)
+		SLT	$t0,	$t0,	$t1
+		addiu	$sp,	$sp,	4
+		sw	$t0,	$sp
+		lw	$t0,	$sp
+		addiu	$sp,	$sp,	4
+		BEQZ	$t0,	Label_4
+		B	Label_3
+Label_4:
+		B	Label_1
+Label_2:
+		addiu	$sp,	$sp,	-4
+		JAL	f		sw	$v0,	$sp
+		lw	$v0,	$sp
+		move	a0,	v0
+		li	$v0,	4
+		syscall

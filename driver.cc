@@ -123,3 +123,24 @@ int driver::parse (const std::string &f)
   // std::cerr << "here3" << std::endl;
   return res;
 }
+
+void driver::pop_loop() {
+  loop_labels_stack.pop_back();
+}
+
+void driver::push_loop() {
+  loop_labels_stack.push_back(std::map<std::string, std::string>());
+  loop_labels_stack.back()["loop"] = get_label();
+  loop_labels_stack.back()["end"] = get_label();
+}
+
+void driver::make_output(Node & node) {
+  std::ofstream out(file + ".out");
+  out << ".text" << std::endl;
+
+  out << "\t\tMOVE\t$s0,\t$sp" << std::endl;
+  out << "\t\taddiu\t$sp,\t$sp,\t" + std::to_string(-4 * global_offset) << std::endl;
+  out << "\t\tB\tmain" << std::endl;
+
+  out << node.code.text;
+}

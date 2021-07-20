@@ -9,54 +9,54 @@
 std::string stackmore(int amount = 1)
 {
     // return "SUBI $sp, " + std::to_string(-4*amount) + "\n";
-    return "addiu $sp, $sp, " + std::to_string(-4 * amount) + "\n";
+    return "\t\taddiu\t$sp,\t$sp,\t" + std::to_string(-4 * amount) + "\n";
 }
 // Decreases stack size and deallocates memory.
 // amount > 0
 std::string stackless(int amount = 1)
 {
     // return "ADDI $sp, " + std::to_string(4*amount) + "\n";
-    return "addiu $sp, $sp, " + std::to_string(4 * amount) + "\n";
+    return "\t\taddiu\t$sp,\t$sp,\t" + std::to_string(4 * amount) + "\n";
 }
 // Loads a number into a register.
 std::string li(int register_number, int value)
 {
-    return "li $" + std::to_string(register_number) + ", " + std::to_string(value) + "\n";
+    return "\t\tli\t$" + std::to_string(register_number) + ",\t" + std::to_string(value) + "\n";
 }
 // Loads a number into a register.
 std::string li(std::string register_name, int value)
 {
-    return "li $" + register_name + ", " + std::to_string(value) + "\n";
+    return "\t\tli\t$" + register_name + ",\t" + std::to_string(value) + "\n";
 }
 // Stores value of a register in an address (destination) .
 std::string sw(int register_number, std::string destination)
 {
-    return "sw $" + std::to_string(register_number) + ", " + destination + "\n";
+    return "\t\tsw\t$" + std::to_string(register_number) + ",\t" + destination + "\n";
 }
 // Stores value of a register in an address (destination) .
 std::string sw(std::string register_name, std::string destination)
 {
-    return "sw $" + register_name + ", " + destination + "\n";
+    return "\t\tsw\t$" + register_name + ",\t" + destination + "\n";
 }
 // Loads value of an address (destination) into a register.
 std::string lw(int register_number, std::string source)
 {
-    return "lw $" + std::to_string(register_number) + ", " + (source[0] == '$' ? "" : "$") + source + "\n";
+    return "\t\tlw\t$" + std::to_string(register_number) + ",\t" + (source[0] == '$' ? "" : "$") + source + "\n";
 }
 // Loads value of an address (destination) in another address or register.
 std::string lw(std::string destination, std::string source)
 {
-    return std::string("lw ") + (destination[0] == '$' ? "" : "$") + destination + ", " + (source[0] == '$' ? "" : "$") + source + "\n";
+    return std::string("\t\tlw\t") + (destination[0] == '$' ? "" : "$") + destination + ",\t" + (source[0] == '$' ? "" : "$") + source + "\n";
 }
 // Copies the contents of source (arg #2) to destination (arg #1).
 std::string move(std::string destination, std::string source)
 {
-    return "move " + destination + ", " + source + "\n";
+    return "\t\tmove\t" + destination + ",\t" + source + "\n";
 }
 // Jumps to the instruction pointed to by $31.
 std::string ret()
 {
-    return "j $31";
+    return "\t\tj $31";
 }
 // Returns "?($sp)" or "$sp"
 std::string sp(int offset = 0)
@@ -85,17 +85,17 @@ std::string reg_offset(std::string reg, int offset)
 // Adds two registers and stores the result in the destination register.
 std::string addregisters(std::string destination, std::string source1, std::string source2)
 {
-    return "ADDU $" + destination + ", $" + source1 + ", $" + source2 + "\n";
+    return "\t\tADDU\t$" + destination + ",\t$" + source1 + ",\t$" + source2 + "\n";
 }
 // Subs two registers and stores the result in the destination register.
 std::string subregisters(std::string destination, std::string source1, std::string source2)
 {
-    return "SUBU $" + destination + ", $" + source1 + ", $" + source2 + "\n";
+    return "\t\tSUBU\t$" + destination + ",\t$" + source1 + ",\t$" + source2 + "\n";
 }
 // Adds an immediate value to a register and stores the result in the destination register.
 std::string addimmediate(std::string destination, std::string source, int amount)
 {
-    return "ADDIU $" + destination + ", $" + source + ", " + std::to_string(amount) + "\n";
+    return "\t\tADDIU\t$" + destination + ",\t$" + source + ",\t" + std::to_string(amount) + "\n";
 }
 
 Node helpers::load_constant(const Constant &c) // DONE
@@ -204,12 +204,12 @@ Node helpers::mul_exp(Node &left, int op, Node &right) // DONE
 
     if (op == 1)
     { // if "*"
-        text << "MUL $t0, $t0, $t1" << std::endl;
+        text << "\t\tMUL\t$t0,\t$t0,\t$t1" << std::endl;
     }
     else
     { // if "/"
-        text << "DIV $t0, $t1" << std::endl;
-        text << "MFLO $t0" << std::endl;
+        text << "\t\tDIV\t$t0,\t$t1" << std::endl;
+        text << "\t\tMFLO\t$t0" << std::endl;
     }
 
     text << stackless(1) << sw("t0", sp(0));
@@ -232,32 +232,32 @@ Node helpers::rel_exp(Node &left, std::string op, Node &right) // DONE
 
     if (op == "<")
     {
-        text << "SLT $t0, $t0, $t1" << std::endl;
+        text << "\t\tSLT\t$t0,\t$t0,\t$t1" << std::endl;
     }
     else if (op == ">")
     {
-        text << "SLT $t0, $t1, $t0" << std::endl;
+        text << "\t\tSLT\t$t0,\t$t1,\t$t0" << std::endl;
     }
     else if (op == "<=")
     {
-        text << "SLT $t0, $t1, $t0" << std::endl;
-        text << "XORI $t0, $t0, 0x1" << std::endl;
+        text << "\t\tSLT\t$t0,\t$t1,\t$t0" << std::endl;
+        text << "\t\tXORI\t$t0,\t$t0,\t1" << std::endl;
     }
     else if (op == ">=")
     {
-        text << "SLT $t0, $t0, $t1" << std::endl;
-        text << "XORI $t0, $t0, 0x1" << std::endl;
+        text << "\t\tSLT\t$t0,\t$t0,\t$t1" << std::endl;
+        text << "\t\tXORI\t$t0,\t$t0,\t1" << std::endl;
     }
     else if (op == "!=")
     {
-        text << "XOR $t0, $t0, $t1" << std::endl;
-        text << "SLTU $t0, $0, $t0" << std::endl;
+        text << "\t\tXOR\t$t0,\t$t0,\t$t1" << std::endl;
+        text << "\t\tSLTU\t$t0,\t$0,\t$t0" << std::endl;
     }
     else
     {
         // "=="
-        text << "XOR $t0, $t0, $t1" << std::endl;
-        text << "SLTIU $t0, $t0, 1" << std::endl;
+        text << "\t\tXOR\t$t0,\t$t0,\t$t1" << std::endl;
+        text << "\t\tSLTIU\t$t0,\t$t0,\t1" << std::endl;
     }
 
     text << stackless(1) << sw("t0", sp(0));
@@ -280,12 +280,12 @@ Node helpers::binary_exp(Node &left, std::string op, Node &right) // DONE
 
     if (op == "&")
     {
-        text << "AND $t0, $t0, $t1" << std::endl;
+        text << "\t\tAND\t$t0,\t$t0,\t$t1" << std::endl;
     }
     else
     {
         // "|"
-        text << "OR $t0, $t0, $t1" << std::endl;
+        text << "\t\tOR\t$t0,\t$t0,\t$t1" << std::endl;
     }
 
     text << stackless(1) << sw("t0", sp(0));
@@ -307,7 +307,7 @@ Node helpers::unary_exp(Node &uexp, int op) // DONE
     std::ostringstream text;
 
     text << uexp.code.text << lw("t0", sp(0))
-         << "NEGU $t0, $t0" << sw("t0", sp(0));
+         << "\t\tNEGU\t$t0,\t$t0" << sw("t0", sp(0));
 
     node.code.text = text.str();
 
@@ -341,7 +341,7 @@ Node helpers::assign(Node &mu, Node &exp) // DONE
     return node;
 }
 
-Node helpers::merge_nodes(Node &left, Node &right)
+Node helpers::merge_nodes(Node &left, Node &right) // DONE
 {
     Node node;
     node.code.text = left.code.text + right.code.text;
@@ -349,7 +349,8 @@ Node helpers::merge_nodes(Node &left, Node &right)
 }
 
 
-Node helpers::return_stmt(driver &drv, yy::location &loc, Node * exp) {
+Node helpers::return_stmt(driver &drv, yy::location &loc, Node * exp) // DONE
+{
     Node node;
 
     std::ostringstream text;
@@ -370,11 +371,17 @@ Node helpers::return_stmt(driver &drv, yy::location &loc, Node * exp) {
 
     }
 
-    text << lw("s0", reg_offset("s0", 1))
-            << lw("ra", reg_offset("s0", 2))
-            << move("sp", "s0")
-            << stackless(2)
-            << "JR $ra\n";
+    if (drv.is_in_main) {
+        text << move("a0", "v0")
+             << "\t\tli\t$v0,\t4" << std::endl
+             << "\t\tsyscall" << std::endl;
+    } else {
+        text << lw("s1", reg_offset("s1", 1))
+                << lw("ra", reg_offset("s1", 2))
+                << move("sp", "s1")
+                << stackless(2)
+                << "\t\tJR\t$ra\n";
+    }
     
     node.code.text = text.str();
 
@@ -382,7 +389,8 @@ Node helpers::return_stmt(driver &drv, yy::location &loc, Node * exp) {
 }
 
 
-Node helpers::create_function(Function func, Node & stmts) {
+Node helpers::create_function(Function func, Node & stmts) // DONE
+ {
     Node node;
 
     std::ostringstream text;
@@ -391,15 +399,15 @@ Node helpers::create_function(Function func, Node & stmts) {
     text << func.id << ":\n"
          << stackmore(3)
          << sw("ra", sp(2))
-         << sw("s0", sp(1))
-         << lw("s0", sp(0));
+         << sw("s1", sp(1))
+         << lw("s1", sp(0));
 
     if (func.number_of_arguments > 0)
         text << stackmore(func.number_of_arguments);
         
     // Load args
     for (int i = 0; i < func.number_of_arguments; i++) {
-        text << sw("a" + std::to_string(i), reg_offset("s0", -i));
+        text << sw("a" + std::to_string(i), reg_offset("s1", -i));
     }
 
 
@@ -410,7 +418,8 @@ Node helpers::create_function(Function func, Node & stmts) {
     return node;
 }
 
-Node helpers::call_function(driver &drv, std::string id, yy::location &loc, std::vector<Node> args){
+Node helpers::call_function(driver &drv, std::string id, yy::location &loc, std::vector<Node> args)// DONE
+{
     
     Function func = drv.get_function(id, loc);
 
@@ -436,7 +445,7 @@ Node helpers::call_function(driver &drv, std::string id, yy::location &loc, std:
 
     text << stackless(args.size() - 1);
 
-    text << "JAL " << func.id;
+    text << "\t\tJAL\t" << func.id;
 
     text << sw("v0", sp(0));
 
@@ -446,7 +455,8 @@ Node helpers::call_function(driver &drv, std::string id, yy::location &loc, std:
 }
 
 
-Node helpers::make_if_stmt(driver &drv, Node& condition, Node& stmts, Node& elifclause, std::string endLabel, bool printEndLabel) {
+Node helpers::make_if_stmt(driver &drv, Node& condition, Node& stmts, Node& elifclause, std::string endLabel, bool printEndLabel) // DONE
+{
     Node node;
     std::ostringstream text;
 
@@ -456,15 +466,109 @@ Node helpers::make_if_stmt(driver &drv, Node& condition, Node& stmts, Node& elif
     text << condition.code.text
          << lw("t0", sp(0))
          << stackless()
-         << "BEQZ $t0, " << falseLabel << std::endl
+         << "\t\tBEQZ\t$t0,\t" << falseLabel << std::endl
          << stmts.code.text
-         << "B " << endLabel << std::endl
+         << "B\t" << endLabel << std::endl
          << falseLabel << ":" << std::endl
          << elifclause.code.text;
 
     if (printEndLabel)
         text << endLabel << ":" << std::endl;
 
+
+    node.code.text = text.str();
+
+    return node;
+}
+
+
+Node helpers::make_while(driver &drv, Node& condition, Node& stmts) // DONE
+ {
+    Node node;
+    std::ostringstream text;
+
+    std::string loop_label = drv.loop_labels_stack.back()["loop"]; // 'condition' label
+    std::string end_label = drv.loop_labels_stack.back()["end"]; // 'after' label
+
+    text << loop_label << ":" << std::endl
+         << condition.code.text
+         << lw("t0", sp(0))
+         << stackless()
+         << "\t\tBEQZ\t$t0,\t" << end_label << std::endl
+         << stmts.code.text
+         << "\t\tB\t" << loop_label << std::endl
+         << end_label << ":" << std::endl;
+
+
+
+    node.code.text = text.str();
+
+    return node;
+}
+
+Node helpers::make_for(driver &drv, Node& init, Node& condition, Node& eachIter, Node& stmts) // DONE
+ {
+    Node node;
+    std::ostringstream text;
+
+
+    std::string cond_label = drv.get_label(); // 'condition' label
+    std::string loop_label = drv.loop_labels_stack.back()["loop"]; // 'each iter' label
+    std::string end_label = drv.loop_labels_stack.back()["end"]; // 'after' label
+
+    text << init.code.text
+         << "\t\tB\t" << cond_label << std::endl
+         << loop_label << ":" << std::endl
+         << eachIter.code.text
+         << cond_label << ":" << std::endl
+         << condition.code.text
+         << lw("t0", sp(0))
+         << stackless()
+         << "\t\tBEQZ\t$t0,\t" << end_label << std::endl
+         << stmts.code.text
+         << "\t\tB\t" << loop_label << std::endl
+         << end_label << ":" << std::endl;
+         
+
+
+    node.code.text = text.str();
+
+    return node;
+}
+
+Node helpers::make_break(driver &drv, yy::location &loc)
+{
+
+    if (drv.loop_labels_stack.size() == 0) {
+        throw yy::parser::syntax_error(loc, "Unexpected break.");
+    }
+
+    Node node;
+    std::ostringstream text;
+
+
+    std::string end_label = drv.loop_labels_stack.back()["end"];
+
+    text << "\t\tB\t" << end_label << std::endl;
+
+    node.code.text = text.str();
+
+    return node;
+}
+
+Node helpers::make_continue(driver &drv, yy::location &loc)
+{
+    if (drv.loop_labels_stack.size() == 0) {
+        throw yy::parser::syntax_error(loc, "Unexpected continue.");
+    }
+
+    Node node;
+    std::ostringstream text;
+
+
+    std::string loop_label = drv.loop_labels_stack.back()["loop"];
+
+    text << "\t\tB\t" << loop_label << std::endl;
 
     node.code.text = text.str();
 

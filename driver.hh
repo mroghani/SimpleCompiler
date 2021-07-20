@@ -26,6 +26,11 @@ public:
     int label_counter;
     std::string get_label();
 
+    std::vector<std::map<std::string, std::string>> loop_labels_stack;
+    void push_loop();
+    void pop_loop();
+
+
 
     // ====> SCOPE
     int curr_scope;
@@ -46,6 +51,8 @@ public:
 
     std::string curr_function;
 
+    bool is_in_main;
+
     // ====> VARIABLES
     int global_offset;
     int function_offset;
@@ -61,10 +68,7 @@ public:
 
     // ====> OUTPUT
 
-    void make_output(Node & node) {
-      std::ofstream out(file + ".out");
-      out << node.code.text;
-    }
+    void make_output(Node & node);
 
 
     // ====> FILE

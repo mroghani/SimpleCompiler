@@ -104,6 +104,7 @@ class driver;
 %nterm <Node>           returnStmt;
 %nterm <Node>           stmt stmtList;
 %nterm <Node>           selectStmt elseifclause;
+%nterm <Node>           varDecl forStmt whileStmt iterStmt breakStmt continueStmt;
 
 %nterm <std::vector<Node>> argList args;
 
@@ -117,7 +118,7 @@ class driver;
 %%
 %start unit;
 
-unit: programm YYEOF                      { drv.make_output($1); std::cout << "goodbye" << std::endl;  /* TODO: Output code. */}
+unit: programm YYEOF                      { drv.make_output($1); std::cout << "goodbye" << std::endl; }
 
 
 programm: declLists                       { $$ = $1; }
@@ -149,9 +150,9 @@ funcDecl: varType ID               { drv.push_scope(); drv.make_func($2, $1); }
          "(" params ")"            { drv.add_args_to_func($5, @5); }
          "<" stmtList ">"          { $$ = helpers::create_function(drv.Functions[$2], $9); drv.pop_scope(); }
 
-        | INT MAIN                 { drv.push_scope(); drv.make_func("main", 1); }
+        | INT MAIN                 { drv.push_scope(); drv.make_func("main", 1);  drv.is_in_main = true; }
           "("                      <std::vector<Var>>{$$ = std::vector<Var>();} ")" 
-          "<" stmtList ">"         { $$ = helpers::create_function(drv.Functions["main"], $8); drv.pop_scope(); }
+          "<" stmtList ">"         { $$ = helpers::create_function(drv.Functions["main"], $8); drv.pop_scope();  drv.is_in_main = false;  }
         ;
 
 params: paramList                         { $$ = $1; }
@@ -173,17 +174,17 @@ stmtList: varDecl "." stmtList     { $$ = $3; }
 stmt: expStmt                      { $$ = $1; }
     | returnStmt                   { $$ = $1; }
     | selectStmt                   { $$ = $1; }
-    | iterStmt                     { $$ = Node(); }
-    | breakStmt                    { $$ = Node(); }
-    | continueStmt                 { $$ = Node(); }
+    | iterStmt                     { $$ = $1; }
+    | breakStmt                    { $$ = $1; }
+    | continueStmt                 { $$ = $1; }
     ;
 
     
-selectStmt: IF "(" exp ")" <std::string>{ $$ = drv.get_label(); } "<" stmtList ">" elseifclause        { $$ = helpers::make_if_stmt(drv, $3, $7, $9, $5, true); }
+selectStmt: IF "(" simpleExp ")" <std::string>{ $$ = drv.get_label(); } "<" stmtList ">" elseifclause        { $$ = helpers::make_if_stmt(drv, $3, $7, $9, $5, true); }
           | SWITCH "(" factor ")" "<" cases ">"                 { $$ = Node(); } // TODO
           ;
 
-elseifclause: ELSE_IF "(" exp ")" <std::string>{ $$ = $<std::string>-3; } "<" stmtList ">" elseifclause  { $$ = helpers::make_if_stmt(drv, $3, $7, $9, $5, false); }
+elseifclause: ELSE_IF "(" simpleExp ")" <std::string>{ $$ = $<std::string>-3; } "<" stmtList ">" elseifclause  { $$ = helpers::make_if_stmt(drv, $3, $7, $9, $5, false); }
             | ELSE "<" stmtList ">"                             { $$ = $3; }
             | %empty                                            { $$ = Node(); }
             ;
@@ -196,20 +197,20 @@ case: CASE simpleExp ":" stmtList
     | DEFAULT ":" stmtList
     ;
 
-iterStmt: whileStmt
-        | forStmt
+iterStmt: whileStmt                { $$ = $1; }
+        | forStmt                  { $$ = $1; }
         ;
 
-whileStmt: WHILE "(" exp ")" "<" stmtList ">"
+whileStmt: WHILE { drv.push_loop(); } "(" simpleExp ")" "<" stmtList ">"                   { $$ = helpers::make_while(drv, $4, $7); drv.pop_loop(); }
          ;
 
-forStmt: FOR "(" varDecl "." exp "." exp ")" "<" stmtList ">"
+forStmt: FOR  { drv.push_loop(); } "(" varDecl "." simpleExp "." exp ")" "<" stmtList ">"  { $$ = helpers::make_for(drv, $4, $6, $8, $11); drv.pop_loop(); }
        ;
 
-breakStmt: BREAK "."
+breakStmt: BREAK "."                      { $$ = helpers::make_break(drv, @1); }
          ;
 
-continueStmt: CONTINUE "."
+continueStmt: CONTINUE "."                { $$ = helpers::make_continue(drv, @1); }
             ;
 
 returnStmt: RETURN "."                    { $$ = helpers::return_stmt(drv, @1, nullptr); }
