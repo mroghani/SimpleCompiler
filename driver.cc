@@ -8,6 +8,9 @@ driver::driver () {
   global_offset = 0;
   function_offset = 0;
   push_scope();
+  
+  in_loop = 0;
+  in_switch = 0;
 }
 
 std::string driver::get_label () {
@@ -70,6 +73,32 @@ Var driver::get_variable(std::string id, yy::location & loc) {
   }
   throw yy::parser::syntax_error(loc, "undefined identifier " + id);
 }
+
+Function driver::get_function(std::string id, yy::location & loc) {
+  auto it = Functions.find(id);
+  if (it != Functions.end()) {
+    return it->second;
+  }
+  throw yy::parser::syntax_error(loc, "undefined identifier " + id);
+}
+
+void driver::make_func(std::string id, int type) {
+  curr_function = id;
+  Functions[curr_function] = Function();
+  Functions[curr_function].id = id;
+  Functions[curr_function].type = (Function::Type)(type - 1);
+
+}
+
+void driver::add_args_to_func(std::vector<Var> &vars, yy::location & loc) {
+  if (vars.size() > 4) {
+    throw yy::parser::syntax_error(loc, "Too many arguments");
+  }
+  Functions[curr_function].number_of_arguments = vars.size();
+
+
+}
+
 
 bool driver::has_variable_in_scope(std::string id, int scope) {
   // auto it = variables[scope].find(id);

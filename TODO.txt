@@ -9,7 +9,6 @@ function structure:
 name_label:
     pre_ (save in stack ra, store local base, allocate space for variables)
 
-    kobs sher
 
     post_ (restore registers (s1 ra), deallocate, return)
 
@@ -25,3 +24,4 @@ g() {
 w() {
 
 }
+

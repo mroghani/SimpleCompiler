@@ -1,5 +1,14 @@
-ADDI $t2, $sp, 4
-MOVE $t3, $t2
-ADDI $t2, $sp, 0
-LW $t0, ($t2)
-SW $t0, ($t3)
+main:
+addiu $sp, $sp, -12
+sw $ra, 8($sp)
+sw $s0, 4($sp)
+lw $s0, $sp
+addiu $sp, $sp, -4
+li $t0, 0
+sw $t0, $sp
+lw $v0, $sp
+lw $s0, $4($s0)
+lw $ra, $8($s0)
+lw $sp, $s0
+addiu $sp, $sp, 8
+JR $ra

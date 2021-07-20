@@ -1,25 +1,6 @@
-int s.
-
-int ss.
-
-char fc (char c, int s) <
-    int x.
-    int y = 3. 
-    x= y.
->
-
-char cs = 'a'.
-
-
-int f(int a) <
-    if (a == 0) <return 0.>
-    return f(a - 1) + a.
->
-
-
-
 
 int main() <
+return 0.
 >
 
 

@@ -33,6 +33,18 @@ public:
     void push_scope();
     void pop_scope();
 
+    int in_loop;
+    int in_switch;
+    
+    // ====> FUNCTIONS
+
+    std::map<std::string, Function> Functions;
+
+    Function get_function(std::string id, yy::location & loc);
+    void make_func(std::string id, int type);
+    void add_args_to_func(std::vector<Var> &vars, yy::location & loc);
+
+    std::string curr_function;
 
     // ====> VARIABLES
     int global_offset;

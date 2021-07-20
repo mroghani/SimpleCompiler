@@ -101,6 +101,9 @@ class driver;
 %nterm <Node>           immutable mutable exp call unaryExp factor;
 %nterm <Node>           simpleExp andExp unaryRelExp relExp sumExp mulExp;
 %nterm <Node>           programm declLists decl funcDecl expStmt;
+%nterm <Node>           returnStmt;
+%nterm <Node>           stmt stmtList;
+
 // %nterm <Node>           cases;
 
 // grammar
@@ -118,7 +121,7 @@ declLists: %empty                         { $$ = Node(); }
          ;
 
 decl: varDecl "."                         { $$ = Node(); }
-    | funcDecl                            { $$ = Node();  /* TODO */}
+    | funcDecl                            { $$ = $1; }
     ;
 
 varDecl: varType ID                       { drv.make_variable($2, @2, $1, 1, 0); }
@@ -131,10 +134,17 @@ varType: INT   { $$ = 1; }
        | CHAR  { $$ = 2; }
        ;
 
-funcDecl: varType ID { drv.push_scope(); }
-          "(" params ")" "<" stmtList ">"  { /** make function **/ drv.pop_scope(); }
-        | VOID ID { drv.push_scope(); } "(" params ")" "<" stmtList ">" { drv.pop_scope(); }
-        | INT MAIN { drv.push_scope(); } "(" <std::vector<Var>>{$$ = std::vector<Var>();} ")" "<" stmtList ">" { drv.pop_scope(); }
+funcDecl: varType ID               { drv.push_scope(); drv.make_func($2, $1); }
+          "(" params ")"           { drv.add_args_to_func($5, @5); }
+          "<" stmtList ">"         { $$ = helpers::create_function(drv.Functions[$2], $9); drv.pop_scope(); }
+
+        | VOID ID                  { drv.push_scope(); drv.make_func($2, 3); }
+         "(" params ")"            { drv.add_args_to_func($5, @5); }
+         "<" stmtList ">"          { $$ = helpers::create_function(drv.Functions[$2], $9); drv.pop_scope(); }
+
+        | INT MAIN                 { drv.push_scope(); drv.make_func("main", 1); }
+          "("                      <std::vector<Var>>{$$ = std::vector<Var>();} ")" 
+          "<" stmtList ">"         { $$ = helpers::create_function(drv.Functions["main"], $8); drv.pop_scope(); }
         ;
 
 params: paramList                         { $$ = $1; }
@@ -148,19 +158,21 @@ paramList: paramList "," paramItem        { $1.push_back($3); $$ = $1; }
 paramItem: varType ID                     { $$ = drv.make_variable($2, @2, $1, 1, 0); }
          ;
 
-stmtList: varDecl "." stmtList
-        | stmt  stmtList
-        | %empty
+stmtList: varDecl "." stmtList     { $$ = $3; }
+        | stmt  stmtList           { $$ = helpers::merge_nodes($1, $2); }
+        | %empty                   { $$ = Node(); }
         ;
 
-stmt: expStmt
-    | selectStmt
+stmt: expStmt                      { $$ = $1; }
+    | returnStmt                   { $$ = $1; }
+    ;
+
+ /* | selectStmt
     | iterStmt
     | breakStmt
     | continueStmt
-    | returnStmt
-    ;
-
+ */   
+    
 selectStmt: IF "(" exp ")" "<" stmtList ">"
           | SWITCH "(" factor ")" "<" cases ">"
           ;
@@ -189,8 +201,8 @@ breakStmt: BREAK "."
 continueStmt: CONTINUE "."
             ;
 
-returnStmt: RETURN "."
-          | RETURN simpleExp "."
+returnStmt: RETURN "."                    { $$ = helpers::return_stmt(drv, @1, nullptr); }
+          | RETURN simpleExp "."          { $$ = helpers::return_stmt(drv, @1, &$2); }
           ;
 
 

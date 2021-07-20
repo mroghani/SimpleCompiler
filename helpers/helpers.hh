@@ -17,6 +17,10 @@ namespace helpers
     Node binary_exp(Node &left, std::string op, Node &right);
     Node assign(Node &mu, Node &exp);
     Node merge_nodes(Node &left, Node &right);
+
+    Node create_function(Function func, Node & stmts);
+
+    Node return_stmt(driver &drv, yy::location &loc, Node * exp);
 };
 
 std::string stackmore(int amount);
@@ -31,7 +35,7 @@ std::string move(std::string destination, std::string source);
 std::string ret();
 std::string sp(int offset);
 std::string fp(int offset);
-std::string reg_offset(std::string reg, int offset = 0);
+std::string reg_offset(std::string reg, int offset);
 
 std::string addregisters(std::string destination, std::string source1, std::string source2);
 std::string subregisters(std::string destination, std::string source1, std::string source2);

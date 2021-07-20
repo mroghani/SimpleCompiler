@@ -41,12 +41,12 @@ std::string sw(std::string register_name, std::string destination)
 // Loads value of an address (destination) into a register.
 std::string lw(int register_number, std::string source)
 {
-    return "lw $" + std::to_string(register_number) + ", " + source + "\n";
+    return "lw $" + std::to_string(register_number) + ", " + (source[0] == '$' ? "" : "$") + source + "\n";
 }
 // Loads value of an address (destination) in another address or register.
 std::string lw(std::string destination, std::string source)
 {
-    return "lw " + destination + ", " + source + "\n";
+    return std::string("lw ") + (destination[0] == '$' ? "" : "$") + destination + ", " + (source[0] == '$' ? "" : "$") + source + "\n";
 }
 // Copies the contents of source (arg #2) to destination (arg #1).
 std::string move(std::string destination, std::string source)
@@ -75,12 +75,12 @@ std::string fp(int offset = 0)
         return "$fp";
 }
 // Returns "?($reg)" or "$reg"
-std::string reg_offset(std::string reg, int offset = 0)
+std::string reg_offset(std::string reg, int offset)
 {
     if (offset)
-        return std::to_string(4 * offset) + "($reg)";
+        return std::to_string(4 * offset) + "($" + reg + ")";
     else
-        return "$reg";
+        return "$" + reg;
 }
 // Adds two registers and stores the result in the destination register.
 std::string addregisters(std::string destination, std::string source1, std::string source2)
@@ -130,7 +130,7 @@ Node helpers::load_mutable(driver &drv, std::string id, yy::location &loc, Node 
     if (ind == nullptr)
     { // variable
         // text << stackmore(1) << lw("t0", reg_offset(base_reg, var.offset)) << sw("t0", sp(0));
-        text << addimmediate("t0", base_reg, 4 * var.offset)
+        text << addimmediate("t0", base_reg, -4 * var.offset)
              << stackmore(1)
              << sw("t0", sp(0));
     }
@@ -138,7 +138,7 @@ Node helpers::load_mutable(driver &drv, std::string id, yy::location &loc, Node 
     {
         // array
         text << ind->code.text // index is on top of stack.
-             << addimmediate("t0", base_reg, 4 * var.offset)
+             << addimmediate("t0", base_reg, -4 * var.offset)
              << lw("t1", sp(0))
              << addregisters("t0", "t0", "t1")
              << sw("t0", sp(0));
@@ -149,7 +149,7 @@ Node helpers::load_mutable(driver &drv, std::string id, yy::location &loc, Node 
     return node;
 }
 
-Node load_mutable_value(Node &mu) // DONE
+Node helpers::load_mutable_value(Node &mu) // DONE
 {
     Node node;
 
@@ -158,6 +158,10 @@ Node load_mutable_value(Node &mu) // DONE
     text << lw("t0", sp(0))
          << lw("t0", "t0") // At first, "t0" holds the address, after this instruction it holds the contents of the address.
          << sw("t0", sp(0));
+    
+    node.code.text = text.str();
+    
+    return node;
 }
 
 Node helpers::sum_exp(Node &left, int op, Node &right) // DONE
@@ -341,5 +345,70 @@ Node helpers::merge_nodes(Node &left, Node &right)
 {
     Node node;
     node.code.text = left.code.text + right.code.text;
+    return node;
+}
+
+
+Node helpers::return_stmt(driver &drv, yy::location &loc, Node * exp) {
+    Node node;
+
+    std::ostringstream text;
+
+
+    if (exp == nullptr) { // if returns nothing
+        if (drv.Functions[drv.curr_function].type != Function::Type::VOID) {
+            throw yy::parser::syntax_error(loc, "return type is not compatible.");
+        }
+    } else { // if returns int or char
+        if (drv.Functions[drv.curr_function].type == Function::Type::VOID) {
+            throw yy::parser::syntax_error(loc, "return type is not compatible.");
+        }
+
+        text << exp->code.text;
+
+        text << lw("v0", "sp");
+
+    }
+
+    text << lw("s0", reg_offset("s0", 1))
+            << lw("ra", reg_offset("s0", 2))
+            << lw("sp", "s0")
+            << stackless(2)
+            << "JR $ra\n";
+    
+    node.code.text = text.str();
+
+    return node;
+}
+
+
+Node helpers::create_function(Function func, Node & stmts) {
+    Node node;
+
+    std::ostringstream text;
+
+    // Store important registers
+    text << func.id << ":\n"
+         << stackmore(3)
+         << sw("ra", sp(2))
+         << sw("s0", sp(1))
+         << lw("s0", sp(0));
+
+    if (func.number_of_arguments > 0)
+        text << stackmore(func.number_of_arguments);
+        
+    // Load args
+    for (int i = 0; i < func.number_of_arguments; i++) {
+        std::string rname = "a0";
+        rname[1] = '0' + i; 
+        text << sw(rname, reg_offset("s0", -i));
+    }
+
+
+    text << stmts.code.text;
+
+
+    node.code.text = text.str();
+
     return node;
 }
