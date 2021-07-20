@@ -5,85 +5,86 @@
 		B	main
 f:
 		addiu	$sp,	$sp,	-12
-		sw	$ra,	8($sp)
-		sw	$s1,	4($sp)
-		lw	$s1,	$sp
+		sw		$ra,	8($sp)
+		sw		$s1,	4($sp)
+		lw		$s1,	$sp
 		addiu	$sp,	$sp,	-4
-		li	$t0,	4
-		sw	$t0,	$sp
-		lw	$v0,	$sp
+		li		$t0,	4
+		sw		$t0,	$sp
+		lw		$v0,	$sp
 		move	a0,	v0
-		li	$v0,	4
+		li		$v0,	4
 		syscall
 main:
 		addiu	$sp,	$sp,	-12
-		sw	$ra,	8($sp)
-		sw	$s1,	4($sp)
-		lw	$s1,	$sp
+		sw		$ra,	8($sp)
+		sw		$s1,	4($sp)
+		lw		$s1,	$sp
 		addiu	$sp,	$sp,	-16
-		li	$t0,	0
-		sw	$t0,	$sp
+		li		$t0,	0
+		sw		$t0,	$sp
 Label_1:
-		lw	$t0,	$sp
-		lw	$t0,	$t0
-		sw	$t0,	$sp
+		lw		$t0,	$sp
+		lw		$t0,	$t0
+		sw		$t0,	$sp
 		addiu	$sp,	$sp,	-4
-		li	$t0,	3
-		sw	$t0,	$sp
-		lw	$t0,	$sp
-		lw	$t1,	$4($sp)
-		XOR	$t0,	$t0,	$t1
+		li		$t0,	3
+		sw		$t0,	$sp
+		lw		$t0,	$sp
+		lw		$t1,	$4($sp)
+		XOR		$t0,	$t0,	$t1
 		SLTU	$t0,	$0,	$t0
 		addiu	$sp,	$sp,	4
-		sw	$t0,	$sp
-		lw	$t0,	$sp
+		sw		$t0,	$sp
+		lw		$t0,	$sp
 		addiu	$sp,	$sp,	4
 		BEQZ	$t0,	Label_2
 		addiu	$sp,	$sp,	-16
-		li	$t0,	0
-		sw	$t0,	$sp
-		B	Label_5
+		li		$t0,	0
+		sw		$t0,	$sp
+		B		Label_5
 Label_3:
-		lw	$t0,	$sp
-		lw	$t0,	$t0
-		sw	$t0,	$sp
+		lw		$t0,	$sp
+		lw		$t0,	$t0
+		sw		$t0,	$sp
 		addiu	$sp,	$sp,	-4
-		li	$t0,	5
-		sw	$t0,	$sp
-		lw	$t0,	$sp
-		lw	$t1,	$4($sp)
+		li		$t0,	5
+		sw		$t0,	$sp
+		lw		$t0,	$sp
+		lw		$t1,	$4($sp)
 		ADDU	$t0,	$t0,	$t1
 		addiu	$sp,	$sp,	4
-		sw	$t0,	$sp
+		sw		$t0,	$sp
 		ADDIU	$t0,	$s1,	-4
 		addiu	$sp,	$sp,	-4
-		sw	$t0,	$sp
-		lw	$t1,	$4($sp)
-		lw	$t0,	$sp
-		sw	$t1,	t0
+		sw		$t0,	$sp
+		lw		$t1,	$4($sp)
+		lw		$t0,	$sp
+		sw		$t1,	t0
 		addiu	$sp,	$sp,	8
 Label_5:
-		lw	$t0,	$sp
-		lw	$t0,	$t0
-		sw	$t0,	$sp
+		lw		$t0,	$sp
+		lw		$t0,	$t0
+		sw		$t0,	$sp
 		addiu	$sp,	$sp,	-4
-		li	$t0,	5
-		sw	$t0,	$sp
-		lw	$t0,	$sp
-		lw	$t1,	$4($sp)
-		SLT	$t0,	$t0,	$t1
+		li		$t0,	5
+		sw		$t0,	$sp
+		lw		$t0,	$sp
+		lw		$t1,	$4($sp)
+		SLT		$t0,	$t0,	$t1
 		addiu	$sp,	$sp,	4
-		sw	$t0,	$sp
-		lw	$t0,	$sp
+		sw		$t0,	$sp
+		lw		$t0,	$sp
 		addiu	$sp,	$sp,	4
 		BEQZ	$t0,	Label_4
-		B	Label_3
+		B		Label_3
 Label_4:
-		B	Label_1
+		B		Label_1
 Label_2:
 		addiu	$sp,	$sp,	-4
-		JAL	f		sw	$v0,	$sp
-		lw	$v0,	$sp
+		JAL		f
+		sw		$v0,	$sp
+		lw		$v0,	$sp
 		move	a0,	v0
-		li	$v0,	4
+		li		$v0,	4
 		syscall

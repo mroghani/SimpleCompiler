@@ -146,7 +146,7 @@ void driver::make_output(Node & node) {
     out << "\t\tli\t\t$t0,\t" + std::to_string(var.initial_value) + "\n"
         << "\t\tsw\t\t$t0,\t$sp\n";
   }
-  out << "\t\tB\tmain" << std::endl;
+  out << "\t\tB\t\tmain" << std::endl;
 
   out << node.code.text;
 }
