@@ -9,6 +9,7 @@ struct Var
     std::string id;
     int scope;
     int initial_value;
+    int size;
 
     enum Type
     {

@@ -26,6 +26,7 @@ namespace helpers
     Node make_for(driver &drv, Node& init, Node& condition, Node& eachIter, Node& stmts);
     Node make_break(driver &drv, yy::location &loc);
     Node make_continue(driver &drv, yy::location &loc);
+    Node var_init(Var & var, bool do_init);
 
 };
 

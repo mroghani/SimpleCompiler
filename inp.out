@@ -1,6 +1,7 @@
 .text
 		MOVE	$s0,	$sp
-		addiu	$sp,	$sp,	-4
+		li		$t0,	2
+		sw		$t0,	$sp
 		B	main
 f:
 		addiu	$sp,	$sp,	-12
@@ -19,6 +20,9 @@ main:
 		sw	$ra,	8($sp)
 		sw	$s1,	4($sp)
 		lw	$s1,	$sp
+		addiu	$sp,	$sp,	-16
+		li	$t0,	0
+		sw	$t0,	$sp
 Label_1:
 		lw	$t0,	$sp
 		lw	$t0,	$t0
@@ -35,6 +39,9 @@ Label_1:
 		lw	$t0,	$sp
 		addiu	$sp,	$sp,	4
 		BEQZ	$t0,	Label_2
+		addiu	$sp,	$sp,	-16
+		li	$t0,	0
+		sw	$t0,	$sp
 		B	Label_5
 Label_3:
 		lw	$t0,	$sp

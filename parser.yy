@@ -132,10 +132,10 @@ decl: varDecl "."                         { $$ = Node(); }
     | funcDecl                            { $$ = $1; }
     ;
 
-varDecl: varType ID                       { drv.make_variable($2, @2, $1, 1, 0); }
-       | varType ID "=" constant          { drv.make_variable($2, @2, $1, 1, $4.value); }
-       | varType ID "=" "-" constant      { drv.make_variable($2, @2, $1, 1, -$5.value); }
-       | varType ID "[" INTCONST "]"      { drv.make_variable($2, @2, $1, $4, 0); }
+varDecl: varType ID                       { auto var = drv.make_variable($2, @2, $1, 1, 0); $$ = helpers::var_init(var, false);}
+       | varType ID "=" constant          { auto var = drv.make_variable($2, @2, $1, 1, $4.value); $$ = helpers::var_init(var, true); }
+       | varType ID "=" "-" constant      { auto var = drv.make_variable($2, @2, $1, 1, -$5.value); $$ = helpers::var_init(var, true);}
+       | varType ID "[" INTCONST "]"      { auto var = drv.make_variable($2, @2, $1, $4, 0); $$ = helpers::var_init(var, false);}
        ;
 
 varType: INT   { $$ = 1; }
@@ -166,7 +166,7 @@ paramList: paramList "," paramItem        { $1.push_back($3); $$ = $1; }
 paramItem: varType ID                     { $$ = drv.make_variable($2, @2, $1, 1, 0); }
          ;
 
-stmtList: varDecl "." stmtList     { $$ = $3; }
+stmtList: varDecl "." stmtList     { $$ = helpers::merge_nodes($1, $3); ; }
         | stmt  stmtList           { $$ = helpers::merge_nodes($1, $2); }
         | %empty                   { $$ = Node(); }
         ;

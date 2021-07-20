@@ -382,7 +382,7 @@ Node helpers::return_stmt(driver &drv, yy::location &loc, Node * exp) // DONE
                 << stackless(2)
                 << "\t\tJR\t$ra\n";
     }
-    
+
     node.code.text = text.str();
 
     return node;
@@ -569,6 +569,24 @@ Node helpers::make_continue(driver &drv, yy::location &loc)
     std::string loop_label = drv.loop_labels_stack.back()["loop"];
 
     text << "\t\tB\t" << loop_label << std::endl;
+
+    node.code.text = text.str();
+
+    return node;
+}
+
+
+Node helpers::var_init(Var & var, bool do_init) {
+    Node node;
+    std::ostringstream text;
+
+
+    text << stackmore(var.size * 4);
+
+    if (do_init) {
+        text << li("t0", var.initial_value)
+             << sw("t0", sp(0));
+    }
 
     node.code.text = text.str();
 

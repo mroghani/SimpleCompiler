@@ -41,6 +41,7 @@ Var driver::make_variable(std::string id, yy::location & loc, int type, int size
   // std::cerr << id << curr_scope << std::endl;
 
   Var var;
+  var.size = size;
   var.id = id;
   if (curr_scope == 0) {
     var.offset = global_offset;
@@ -139,7 +140,12 @@ void driver::make_output(Node & node) {
   out << ".text" << std::endl;
 
   out << "\t\tMOVE\t$s0,\t$sp" << std::endl;
-  out << "\t\taddiu\t$sp,\t$sp,\t" + std::to_string(-4 * global_offset) << std::endl;
+  // out << "\t\taddiu\t$sp,\t$sp,\t" + std::to_string(-4 * global_offset) << std::endl;
+  for (auto v : variables[0]) {
+    auto var = v.second;
+    out << "\t\tli\t\t$t0,\t" + std::to_string(var.initial_value) + "\n"
+        << "\t\tsw\t\t$t0,\t$sp\n";
+  }
   out << "\t\tB\tmain" << std::endl;
 
   out << node.code.text;
